@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;;
+;; 
 
 ;;; Code:
 
@@ -29,7 +29,12 @@
 (define-namespace blog-admin-backend-
 
 (defvar plist nil
-  "Backend plist")
+  "Backend plist"
+  :group blog-admin)
+
+(defvar path nil
+  "Blog path in filesystem"
+  :group blog-admin)
 
 ;; namespace
 
@@ -37,12 +42,12 @@
   "Build data source from backend defined"
   (let* ((blog-backend (plist-get plist keyword))
          (scan-posts (plist-get blog-backend :scan-posts))
-         (read-date      (plist-get blog-backend :read-date))
-         (read-title     (plist-get blog-backend :read-title))
-         (read-category  (plist-get blog-backend :read-category))
+         (read-info  (plist-get blog-backend :read-info))
          )
     (mapcar (lambda (file)
-              ( (funcall read-date file) (funcall read-title file) (funcall read-category file) )
+              (let ((info (funcall read-info file)))
+                (list (plist-get info :date) (plist-get info :category) (plist-get info :title))
+                )
               ) (funcall scan-posts))
     ))
 
@@ -50,19 +55,34 @@
   "Put backend define into blog-admin-backend-plist"
   (setq plist (plist-put plist keyword backend)))
 
+;; org
+(defun org-property-list (filename org-backend)
+  (if filename
+      (with-temp-buffer
+        (insert-file-contents filename)
+        (org-mode)
+        (setq plist (org-export-get-environment org-backend))
+        (setq plist (plist-put plist :input-file filename)))
+    (setq plist (org-export-backend-options org-backend))
+    plist))
+
 ;; hexo
+(org-export-define-derived-backend 'hexo-org 'html
+  :options-alist
+  '((:date "DATE" nil nil)
+    (:category "CATEGORIES" nil nil)
+    (:title "TITLE" nil nil)))
+
 (define :hexo
   '(
     :scan-posts
     (lambda () (directory-files
                 (expand-file-name
-                 "~/blog/source/_posts") t "^[0-9].*\\.org$"))
-    :read-date
-    (lambda (post) "test")
-    :read-title
-    (lambda (post) "title")
-    :read-category
-    (lambda (post) "category")
+                 path "source/_posts") t "^.*\\.org$"))
+    :read-info
+    (lambda (post)
+      (org-property-list post 'hexo-org)
+      )
     ))
 
   ) ;; namespace blog-admin-backend end here

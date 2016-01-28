@@ -20,6 +20,8 @@
 
 ;;; Commentary:
 
+;; (setq blog-admin-backend-path "~/blog")
+;; (setq blog-admin-backend-type :hexo)
 ;;
 
 ;;; Code:
@@ -34,11 +36,13 @@
 ;; namespace blog-admin
 
 (defvar mode-buffer nil
-  "Main buffer of blog-admin")
+  "Main buffer of blog-admin"
+  :group blog-admin)
 
 ;; keymap
 (defvar mode-map nil
-  "Keymap for blog-admin-mode")
+  "Keymap for blog-admin-mode"
+  :group blog-admin)
 
 ;; table
 (defun build-table (contents keymap)
@@ -79,7 +83,7 @@
   (switch-to-buffer mode-buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
-  (setq a (backend-build-datasource :hexo))
+  (build-table (backend-build-datasource :hexo) mode-map)
   )
 
 );; namespace blog-admin end here
