@@ -110,31 +110,31 @@
   (insert (blog-admin--table-header))
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
-    (setq blog-admin-table (ctbl:create-table-component-region
-                            :param param
-                            :width  nil
-                            :height nil
-                            :keymap keymap
-                            :model
-                            (make-ctbl:model
-                             :data contents
-                             :sort-state '(-1 2)
-                             :column-model
-                             (list (make-ctbl:cmodel
-                                    :title "Date"
-                                    :sorter 'ctbl:sort-string-lessp
-                                    :min-width 10
-                                    :align 'left)
-                                   (make-ctbl:cmodel
-                                    :title "Category"
-                                    :align 'left
-                                    :sorter 'ctbl:sort-string-lessp)
-                                   (make-ctbl:cmodel
-                                    :title "Title"
-                                    :align 'left
-                                    :min-width 40
-                                    :max-width 140)
-                                   ))))
+    (save-excursion (setq blog-admin-table (ctbl:create-table-component-region
+                                            :param param
+                                            :width  nil
+                                            :height nil
+                                            :keymap keymap
+                                            :model
+                                            (make-ctbl:model
+                                             :data contents
+                                             :sort-state '(-1 2)
+                                             :column-model
+                                             (list (make-ctbl:cmodel
+                                                    :title "Date"
+                                                    :sorter 'ctbl:sort-string-lessp
+                                                    :min-width 10
+                                                    :align 'left)
+                                                   (make-ctbl:cmodel
+                                                    :title "Category"
+                                                    :align 'left
+                                                    :sorter 'ctbl:sort-string-lessp)
+                                                   (make-ctbl:cmodel
+                                                    :title "Title"
+                                                    :align 'left
+                                                    :min-width 40
+                                                    :max-width 140)
+                                                   )))))
 
     (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
     ))
@@ -167,8 +167,6 @@
   (erase-buffer)
   (blog-admin--table-build (blog-admin-backend-build-datasource :hexo) blog-admin-mode-map)
   (blog-admin-mode)
-  (ctbl:navi-goto-cell
-   (ctbl:find-first-cell (ctbl:component-dest org-octopress-component)))
   )
 
 (defun blog-admin-mode ()
