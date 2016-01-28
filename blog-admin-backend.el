@@ -24,68 +24,69 @@
 
 ;;; Code:
 
-(require 'names)
 
-(define-namespace blog-admin-backend-
+(defvar blog-admin-backend-plist nil
+  "Backend blog-admin-backend-plist")
 
-(defvar plist nil
-  "Backend plist"
-  :group blog-admin)
+(defvar blog-admin-backend-path nil
+  "Blog path in filesystem")
 
-(defvar path nil
-  "Blog path in filesystem"
-  :group blog-admin)
+(defvar blog-admin-backend-type :hexo
+  "Type of blog backend, options :hexo")
 
 ;; namespace
 
-(defun build-datasource (keyword)
+(defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
-  (let* ((blog-backend (plist-get plist keyword))
+  (let* ((blog-backend (plist-get blog-admin-backend-plist keyword))
          (scan-posts (plist-get blog-backend :scan-posts))
          (read-info  (plist-get blog-backend :read-info))
          )
     (mapcar (lambda (file)
+              "Convert info into datesource"
               (let ((info (funcall read-info file)))
-                (list (plist-get info :date) (plist-get info :category) (plist-get info :title))
+                (list (plist-get info :date) (plist-get info :category) (plist-get info :title) file)
                 )
               ) (funcall scan-posts))
     ))
 
-(defun define (keyword backend)
-  "Put backend define into blog-admin-backend-plist"
-  (setq plist (plist-put plist keyword backend)))
+(defun blog-admin-backend-define (keyword backend)
+  "Put backend blog-admin-backend-define into blog-admin-backend-plist"
+  (setq blog-admin-backend-plist (plist-put blog-admin-backend-plist keyword backend)))
 
 ;; org
-(defun org-property-list (filename org-backend)
+(defun blog-admin-backend--org-property-list (filename org-backend)
   (if filename
       (with-temp-buffer
         (insert-file-contents filename)
         (org-mode)
-        (setq plist (org-export-get-environment org-backend))
-        (setq plist (plist-put plist :input-file filename)))
-    (setq plist (org-export-backend-options org-backend))
-    plist))
+        (org-export-get-environment org-backend))))
 
-;; hexo
+;; hexo blog-admin-backend-define
 (org-export-define-derived-backend 'hexo-org 'html
   :options-alist
   '((:date "DATE" nil nil)
     (:category "CATEGORIES" nil nil)
     (:title "TITLE" nil nil)))
 
-(define :hexo
-  '(
-    :scan-posts
-    (lambda () (directory-files
-                (expand-file-name
-                 path "source/_posts") t "^.*\\.org$"))
-    :read-info
-    (lambda (post)
-      (org-property-list post 'hexo-org)
-      )
-    ))
+(defun blog-admin-backend--hexo-scan-posts ()
+  "Scan posts of hexo"
+  (directory-files
+   (expand-file-name (concat (file-name-as-directory blog-admin-backend-path) "/source/_posts"))
+   t "^.*\\.org$"))
 
-  ) ;; namespace blog-admin-backend end here
+(defun blog-admin-backend--hexo-read-info (post)
+  "Read info of hexo post"
+  (blog-admin-backend--org-property-list post 'hexo-org)
+  )
+
+(blog-admin-backend-define :hexo
+                           '(:scan-posts
+                             blog-admin-backend--hexo-scan-posts
+                             :read-info
+                             blog-admin-backend--hexo-read-info
+                             ))
+
 
 (provide 'blog-admin-backend)
 ;;; blog-admin-backend.el ends here
