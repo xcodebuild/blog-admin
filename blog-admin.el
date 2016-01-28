@@ -46,7 +46,18 @@
   "blog admin summary table")
 
 ;; table
-(defun blog-admin-build-table (contents keymap)
+
+(defun blog-admin--table-current-file ()
+  (nth 3 (ctbl:cp-get-selected-data-row blog-admin-table))
+  )
+
+(defun blog-admin--table-click ()
+  "Click event for table"
+  (message "test")
+  (find-file (blog-admin--table-current-file)))
+
+
+(defun blog-admin--table-build (contents keymap)
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
     (setq blog-admin-table (ctbl:create-table-component-region
@@ -74,11 +85,8 @@
                                     :min-width 40
                                     :max-width 140)
                                    ))))
-    (ctbl:cp-add-click-hook
-     blog-admin-table
-     (lambda ()
-       (message "test")
-       (find-file (nth 4 (ctbl:cp-get-selected-data-row nil)))))
+
+    (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
     ))
 
 (defun blog-admin--merge-keymap (keymap1 keymap2)
@@ -109,7 +117,7 @@
   (switch-to-buffer blog-admin-mode-buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
-  (blog-admin-build-table (blog-admin-backend-build-datasource :hexo) blog-admin-mode-map)
+  (blog-admin--table-build (blog-admin-backend-build-datasource :hexo) blog-admin-mode-map)
   )
 
 (provide 'blog-admin)
