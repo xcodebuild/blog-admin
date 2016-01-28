@@ -62,7 +62,7 @@
         (org-mode)
         (org-export-get-environment org-backend))))
 
-;; hexo blog-admin-backend-define
+;; hexo define
 (org-export-define-derived-backend 'hexo-org 'html
   :options-alist
   '((:date "DATE" nil nil)

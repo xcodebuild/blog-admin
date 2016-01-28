@@ -30,7 +30,7 @@
 ;;; Code:
 (require 'org)
 (require 'ctable)
-;; (require 'blog-admin-backend)
+(require 'blog-admin-backend)
 
 (setq blog-admin-backend-path "~/blog/")
 
@@ -38,12 +38,35 @@
 (defvar blog-admin-mode-buffer nil
   "Main buffer of blog-admin")
 
+(defvar blog-admin-mode-hook nil
+  "Hooks for blog-admin-mode")
+
 ;; keymap
 (defvar blog-admin-mode-map nil
   "Keymap for blog-admin-mode")
 
 (defvar blog-admin-table nil
   "blog admin summary table")
+
+(defun blog-admin--merge-keymap (keymap1 keymap2)
+  (append keymap1
+          (delq nil
+                (mapcar
+                 (lambda (x)
+                   (if (or (not (consp x))
+                           (assoc (car x) keymap1))
+                       nil x))
+                 keymap2))))
+
+
+;; map
+(unless blog-admin-mode-map
+  (setq blog-admin-mode-map (make-sparse-keymap))
+  (define-key blog-admin-mode-map "d" 'blog-admin-delete-post)
+  (define-key blog-admin-mode-map "r" 'blog-admin-refresh)
+  (setq blog-admin-mode-map
+        (blog-admin--merge-keymap ctbl:table-mode-map blog-admin-mode-map)))
+
 
 ;; table
 
@@ -56,8 +79,35 @@
   (message "test")
   (find-file (blog-admin--table-current-file)))
 
+(defun blog-admin--table-header (&optional title)
+  (concat
+   (format "%s\n" (or title "Blog"))
+   (mapconcat
+    'identity
+    (blog-admin--table-help
+     (cl-remove-duplicates
+      (mapcar 'cdr (cdr blog-admin-mode-map)))
+     blog-admin-mode-map)
+    "\n")
+   "\n\n\n"))
+
+(defun blog-admin--table-help (symbols &optional keymap)
+  (let (symbol keysym keystr docstr summary-list)
+    (while (setq symbol (car symbols))
+      (setq keysym (where-is-internal symbol (or keymap (current-local-map)) nil)
+            keystr (if keysym (mapconcat 'key-description keysym ",") "No keybind")
+            docstr (documentation symbol))
+      (if docstr
+          (setq summary-list (cons (format "%10s ... %s (%s)"
+                                           keystr
+                                           (car (split-string docstr "\n"))
+                                           symbol)
+                                   summary-list)))
+      (setq symbols (cdr symbols)))
+    summary-list))
 
 (defun blog-admin--table-build (contents keymap)
+  (insert (blog-admin--table-header))
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
     (setq blog-admin-table (ctbl:create-table-component-region
@@ -89,24 +139,22 @@
     (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
     ))
 
-(defun blog-admin--merge-keymap (keymap1 keymap2)
-  (append keymap1
-          (delq nil
-                (mapcar
-                 (lambda (x)
-                   (if (or (not (consp x))
-                           (assoc (car x) keymap1))
-                       nil x))
-                 keymap2))))
-
-
 
 (defun blog-admin-refresh ()
-  "Refresh buffer."
+  "Refresh *Blog*"
   (interactive)
   (when blog-admin-mode-buffer
     (kill-buffer blog-admin-mode-buffer)
     (blog-admin-start)))
+
+(defun blog-admin-delete-post ()
+  "Delete post"
+  (let ((file) (blog-admin--table-current-file))
+    (if (y-or-n-p (format "Do you really want to delete %s" file))
+        (progn
+          (delete-file file)
+          (blog-admin-refresh)
+          ))))
 
 ;; main
 
@@ -118,7 +166,22 @@
   (setq buffer-read-only nil)
   (erase-buffer)
   (blog-admin--table-build (blog-admin-backend-build-datasource :hexo) blog-admin-mode-map)
+  (blog-admin-mode)
+  (ctbl:navi-goto-cell
+   (ctbl:find-first-cell (ctbl:component-dest org-octopress-component)))
   )
+
+(defun blog-admin-mode ()
+  "Major mode for blog-admin"
+  (kill-all-local-variables)
+  (setq truncate-lines t)
+  (use-local-map blog-admin-mode-map)
+  (setq major-mode 'blog-admin-mode
+        mode-name  "Blog")
+  (setq buffer-undo-list t
+        buffer-read-only t)
+  (run-hooks 'blog-admin-mode-hook))
+
 
 (provide 'blog-admin)
 ;;; blog-admin.el ends here
