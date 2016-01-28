@@ -76,7 +76,6 @@
 
 (defun blog-admin--table-click ()
   "Click event for table"
-  (message "test")
   (find-file (blog-admin--table-current-file)))
 
 (defun blog-admin--table-header (&optional title)
@@ -149,10 +148,11 @@
 
 (defun blog-admin-delete-post ()
   "Delete post"
-  (let ((file) (blog-admin--table-current-file))
-    (if (y-or-n-p (format "Do you really want to delete %s" file))
+  (interactive)
+  (let ( (file-path (blog-admin--table-current-file)) )
+    (if (y-or-n-p (format "Do you really want to delete %s" file-path))
         (progn
-          (delete-file file)
+          (delete-file file-path)
           (blog-admin-refresh)
           ))))
 
