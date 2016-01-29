@@ -30,7 +30,7 @@
 ;;; Code:
 (require 'org)
 (require 'ctable)
-(require 'blog-admin-backend)
+(require 'blog-admin-backend-hexo)
 
 (setq blog-admin-backend-path "~/blog/")
 

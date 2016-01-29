@@ -35,15 +35,6 @@
 (defvar blog-admin-backend-type 'hexo
   "Type of blog backend, options :hexo")
 
-;; hexo defvar
-(defvar blog-admin-backend-hexo-default-file-type 'markdown
-  "Default file type of new post, 'markdown or 'org ")
-(defvar blog-admin-backend-hexo-default-post-publish nil
-  "`nil`->new post will be publish, `t`-> new post will be placed in draft")
-
-(defvar blog-admin-backend-hexo-posts-dir "source/_posts")
-(defvar blog-admin-backend-hexo-drafts-dir "source/_drafts")
-
 (defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
   (let* ((blog-backend (plist-get blog-admin-backend-plist keyword))
@@ -88,94 +79,6 @@
   (let ((l (parse-time-string datetime-str)))
     (format-time-string "%Y-%m-%d" (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))
   )
-
-;; hexo define
-(org-export-define-derived-backend 'hexo-org 'html
-  :options-alist
-  '((:date "DATE" nil nil)
-    (:title "TITLE" nil nil)))
-
-(defun blog-admin-backend--hexo-scan-posts ()
-  "Scan posts of hexo"
-  (apply 'append
-         (mapcar
-          (lambda (append-path)
-            "scan files with append-path"
-            (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.\\(org\\|md\\|markdown\\)$"))
-          (list blog-admin-backend-hexo-posts-dir blog-admin-backend-hexo-drafts-dir)
-          )))
-
-(defun blog-admin-backend--hexo-is-in-drafts? (post)
-  "Return whether is post in drafts"
-  (s-starts-with?
-   (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) post))
-
-(defun blog-admin-backend--hexo-read-info (post)
-  "Read info of hexo post"
-  (let ((info (if (s-ends-with? ".org" post)
-                  ;; org post
-                  (blog-admin-backend--hexo-read-org-info post)
-                ;; markdown post
-                (blog-admin-backend--hexo-read-md-info post))))
-    ;; read if publish
-    (if (blog-admin-backend--hexo-is-in-drafts? post)
-        ;; then
-        (plist-put info :publish "NO")
-      ;; else
-      (plist-put info :publish "YES")
-      )
-    ;; format datetime
-    (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
-    ))
-
-(defun blog-admin-backend--hexo-exchange-place (path)
-  "Drafts->posts, posts->drafts"
-  (if (f-exists? path)
-      (let* ((name (f-filename path)))
-        (if (blog-admin-backend--hexo-is-in-drafts? path)
-            ;; drafts->posts
-            (f-move (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) name)
-                    (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-posts-dir) name))
-          ;; posts->drafts
-          (f-move (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-posts-dir) name)
-                  (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) name))
-          ))))
-
-(defun blog-admin-backend--hexo-publish-or-unpublish ()
-  "Switch between publish and drafts"
-  (interactive)
-  (let* ((post (blog-admin--table-current-file))
-         (dirpath (f-no-ext post)))
-    (blog-admin-backend--hexo-exchange-place post)
-    (blog-admin-backend--hexo-exchange-place dirpath)
-    (blog-admin-refresh)
-    ))
-
-(defun blog-admin-backend--hexo-read-md-info (post)
-  "Read info of hexo markdown post"
-  (with-temp-buffer
-    (insert-file-contents post)
-    (let ((info nil))
-      (setq info (plist-put info :title
-                            (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
-      (plist-put info :date
-                 (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
-      info
-      )
-    ))
-
-(defun blog-admin-backend--hexo-read-org-info (post)
-  "Read info of hexo org post"
-  (blog-admin-backend--org-property-list post 'hexo-org))
-
-(blog-admin-backend-define 'hexo
-         '(:scan-posts-func
-           blog-admin-backend--hexo-scan-posts
-           :read-info-func
-           blog-admin-backend--hexo-read-info
-           :publish-unpublish-func
-           blog-admin-backend--hexo-publish-or-unpublish
-           ))
 
 
 (provide 'blog-admin-backend)
