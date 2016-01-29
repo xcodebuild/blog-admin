@@ -24,7 +24,7 @@
 ;;; Commentary:
 
 ;; (setq blog-admin-backend-path "~/blog")
-;; (setq blog-admin-backend-type :hexo)
+;; (setq blog-admin-backend-type 'hexo)
 ;;
 
 ;;; Code:
@@ -122,11 +122,12 @@
                                    (list (make-ctbl:cmodel
                                           :title "Date"
                                           :sorter 'ctbl:sort-string-lessp
-                                          :min-width 10
+                                          :max-width 10
                                           :align 'left)
                                          (make-ctbl:cmodel
-                                          :title "Category"
+                                          :title "Tags"
                                           :align 'left
+                                          :max-width 10
                                           :sorter 'ctbl:sort-string-lessp)
                                          (make-ctbl:cmodel
                                           :title "Publish"
@@ -174,7 +175,7 @@
   (switch-to-buffer blog-admin-mode-buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
-  (blog-admin--table-build (blog-admin-backend-build-datasource :hexo) blog-admin-mode-map)
+  (blog-admin--table-build (blog-admin-backend-build-datasource blog-admin-backend-type) blog-admin-mode-map)
   (blog-admin-mode)
   )
 

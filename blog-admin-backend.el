@@ -31,7 +31,7 @@
 (defvar blog-admin-backend-path nil
   "Blog path in filesystem")
 
-(defvar blog-admin-backend-type :hexo
+(defvar blog-admin-backend-type 'hexo
   "Type of blog backend, options :hexo")
 
 ;; namespace
@@ -39,13 +39,13 @@
 (defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
   (let* ((blog-backend (plist-get blog-admin-backend-plist keyword))
-         (scan-posts (plist-get blog-backend :scan-posts))
-         (read-info  (plist-get blog-backend :read-info))
+         (scan-posts (plist-get blog-backend :scan-posts-func))
+         (read-info  (plist-get blog-backend :read-info-func))
          )
     (mapcar (lambda (file)
               "Convert info into datesource"
               (let ((info (funcall read-info file)))
-                (list (plist-get info :date) (plist-get info :category) (plist-get info :publish) (plist-get info :title) file)
+                (list (plist-get info :date) (plist-get info :tags) (plist-get info :publish) (plist-get info :title) file)
                 )
               ) (funcall scan-posts))
     ))
@@ -70,12 +70,16 @@
     (file-name-as-directory blog-admin-backend-path)
     append-path)))
 
+(defun blog-admin-backend--format-datetime (datetime-str)
+  (let ((l (parse-time-string datetime-str)))
+    (format-time-string "%Y-%m-%d" (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))
+  )
 
 ;; hexo define
 (org-export-define-derived-backend 'hexo-org 'html
   :options-alist
   '((:date "DATE" nil nil)
-    (:category "CATEGORIES" nil nil)
+    (:tags "TAGS" nil nil)
     (:title "TITLE" nil nil)))
 
 (defun blog-admin-backend--hexo-scan-posts ()
@@ -90,7 +94,10 @@
 
 (defun blog-admin-backend--hexo-read-info (post)
   "Read info of hexo post"
-  (let ((info (blog-admin-backend--org-property-list post 'hexo-org)))
+  (let* ((info (blog-admin-backend--org-property-list post 'hexo-org))
+         (datetime-str (plist-get info :date))
+         )
+    ;; read if publish
     (if (s-starts-with?
          (blog-admin-backend--full-path "source/_posts") post)
         ;; then
@@ -98,13 +105,14 @@
       ;; else
       (plist-put info :publish "NO")
       )
+    (plist-put info :date (blog-admin-backend--format-datetime datetime-str))
     info
     ))
 
-(blog-admin-backend-define :hexo
-         '(:scan-posts
+(blog-admin-backend-define 'hexo
+         '(:scan-posts-func
            blog-admin-backend--hexo-scan-posts
-           :read-info
+           :read-info-func
            blog-admin-backend--hexo-read-info
            ))
 
