@@ -23,7 +23,7 @@
 ;; 
 
 ;;; Code:
-
+(require 's)
 
 (defvar blog-admin-backend-plist nil
   "Backend blog-admin-backend-plist")
@@ -45,7 +45,7 @@
     (mapcar (lambda (file)
               "Convert info into datesource"
               (let ((info (funcall read-info file)))
-                (list (plist-get info :date) (plist-get info :category) (plist-get info :title) file)
+                (list (plist-get info :date) (plist-get info :category) (plist-get info :publish) (plist-get info :title) file)
                 )
               ) (funcall scan-posts))
     ))
@@ -62,6 +62,15 @@
         (org-mode)
         (org-export-get-environment org-backend))))
 
+;; helper
+(defun blog-admin-backend--full-path (append-path)
+  "Return full absolute path base on `blog-admin-backend-path`"
+  (expand-file-name
+   (concat
+    (file-name-as-directory blog-admin-backend-path)
+    append-path)))
+
+
 ;; hexo define
 (org-export-define-derived-backend 'hexo-org 'html
   :options-alist
@@ -71,21 +80,33 @@
 
 (defun blog-admin-backend--hexo-scan-posts ()
   "Scan posts of hexo"
-  (directory-files
-   (expand-file-name (concat (file-name-as-directory blog-admin-backend-path) "/source/_posts"))
-   t "^.*\\.org$"))
+  (apply 'append
+         (mapcar
+          (lambda (append-path)
+            "scan files with append-path"
+            (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.org$"))
+          '("source/_posts" "source/_drafts")
+          )))
 
 (defun blog-admin-backend--hexo-read-info (post)
   "Read info of hexo post"
-  (blog-admin-backend--org-property-list post 'hexo-org)
-  )
+  (let ((info (blog-admin-backend--org-property-list post 'hexo-org)))
+    (if (s-starts-with?
+         (blog-admin-backend--full-path "source/_posts") post)
+        ;; then
+        (plist-put info :publish "YES")
+      ;; else
+      (plist-put info :publish "NO")
+      )
+    info
+    ))
 
 (blog-admin-backend-define :hexo
-                           '(:scan-posts
-                             blog-admin-backend--hexo-scan-posts
-                             :read-info
-                             blog-admin-backend--hexo-read-info
-                             ))
+         '(:scan-posts
+           blog-admin-backend--hexo-scan-posts
+           :read-info
+           blog-admin-backend--hexo-read-info
+           ))
 
 
 (provide 'blog-admin-backend)

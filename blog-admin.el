@@ -6,7 +6,7 @@
 ;; Keywords: tools, blog, org
 
 ;; Version: 0.1
-;; Package-Requires: ((org "8.0") (ctable "0.1.1")
+;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@
 ;; table
 
 (defun blog-admin--table-current-file ()
-  (nth 3 (ctbl:cp-get-selected-data-row blog-admin-table))
+  (nth 4 (ctbl:cp-get-selected-data-row blog-admin-table))
   )
 
 (defun blog-admin--table-click ()
@@ -110,30 +110,34 @@
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
     (save-excursion (setq blog-admin-table (ctbl:create-table-component-region
-                                            :param param
-                                            :width  nil
-                                            :height nil
-                                            :keymap keymap
-                                            :model
-                                            (make-ctbl:model
-                                             :data contents
-                                             :sort-state '(-1 2)
-                                             :column-model
-                                             (list (make-ctbl:cmodel
-                                                    :title "Date"
-                                                    :sorter 'ctbl:sort-string-lessp
-                                                    :min-width 10
-                                                    :align 'left)
-                                                   (make-ctbl:cmodel
-                                                    :title "Category"
-                                                    :align 'left
-                                                    :sorter 'ctbl:sort-string-lessp)
-                                                   (make-ctbl:cmodel
-                                                    :title "Title"
-                                                    :align 'left
-                                                    :min-width 40
-                                                    :max-width 140)
-                                                   )))))
+                                  :param param
+                                  :width  nil
+                                  :height nil
+                                  :keymap keymap
+                                  :model
+                                  (make-ctbl:model
+                                   :data contents
+                                   :sort-state '(-1 2)
+                                   :column-model
+                                   (list (make-ctbl:cmodel
+                                          :title "Date"
+                                          :sorter 'ctbl:sort-string-lessp
+                                          :min-width 10
+                                          :align 'left)
+                                         (make-ctbl:cmodel
+                                          :title "Category"
+                                          :align 'left
+                                          :sorter 'ctbl:sort-string-lessp)
+                                         (make-ctbl:cmodel
+                                          :title "Publish"
+                                          :align 'left
+                                          :sorter 'ctbl:sort-string-lessp)
+                                         (make-ctbl:cmodel
+                                          :title "Title"
+                                          :align 'left
+                                          :min-width 40
+                                          :max-width 140)
+                                         )))))
 
     (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
     ))
@@ -153,6 +157,11 @@
     (if (y-or-n-p (format "Do you really want to delete %s" file-path))
         (progn
           (delete-file file-path)
+          ;; remove asset directory if exist
+          (let ((dir-path (file-name-sans-extension file-path)))
+            (if (file-exists-p dir-path)
+                (delete-directory dir-path t))
+            )
           (blog-admin-refresh)
           ))))
 
