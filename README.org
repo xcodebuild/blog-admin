@@ -1,0 +1,18 @@
+* blog-admin
+Write blog in emacs with hexo.
+* Preview
+[[http://i4.tietuku.com/b2754eaf5c233a7d.gif][preview]]
+* Usage
++ ~(require 'blog-admin)~ first
++ ~M-x blog-admin-start~ to start this.
++ ~d~ to delete current post
++ ~w~ to 
+* hexo
+** orgmode & markdown
+Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.But this plugin *do nothing about render*.If you want to make orgmode work with hexo,you'd better use [[https://github.com/CodeFalling/hexo-renderer-org][hexo-renderer-org]].
+** configure
+#+BEGIN_SRC emacs-lisp
+  (setq blog-admin-backend-path "~/blog")
+  (setq blog-admin-backend-hexo-new-post-in-drafts t) ;; create new post in drafts by default
+  (setq blog-admin-backend-hexo-new-post-with-same-name-dir t) ;; create same-name directory with new post
+#+END_SRC
