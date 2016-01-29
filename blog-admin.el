@@ -71,7 +71,7 @@
 ;; table
 
 (defun blog-admin--table-current-file ()
-  (nth 4 (ctbl:cp-get-selected-data-row blog-admin-table))
+  (nth 2 (ctbl:cp-get-selected-data-row blog-admin-table))
   )
 
 (defun blog-admin--table-click ()

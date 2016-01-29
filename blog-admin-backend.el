@@ -34,7 +34,11 @@
 (defvar blog-admin-backend-type 'hexo
   "Type of blog backend, options :hexo")
 
-;; namespace
+;; hexo defvar
+(defvar blog-admin-backend-hexo-default-file-type 'markdown
+  "Default file type of new post, 'markdown or 'org ")
+(defvar blog-admin-backend-hexo-default-post-publish nil
+  "`nil`->new post will be publish, `t`-> new post will be placed in draft")
 
 (defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
@@ -88,15 +92,17 @@
          (mapcar
           (lambda (append-path)
             "scan files with append-path"
-            (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.org$"))
+            (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.\\(org\\|md\\|markdown\\)$"))
           '("source/_posts" "source/_drafts")
           )))
 
 (defun blog-admin-backend--hexo-read-info (post)
   "Read info of hexo post"
-  (let* ((info (blog-admin-backend--org-property-list post 'hexo-org))
-         (datetime-str (plist-get info :date))
-         )
+  (let ((info (if (s-ends-with? ".org" post)
+                  ;; org post
+                  (blog-admin-backend--hexo-read-org-info post)
+                ;; markdown post
+                (blog-admin-backend--hexo-read-md-info post))))
     ;; read if publish
     (if (s-starts-with?
          (blog-admin-backend--full-path "source/_posts") post)
@@ -105,9 +111,26 @@
       ;; else
       (plist-put info :publish "NO")
       )
-    (plist-put info :date (blog-admin-backend--format-datetime datetime-str))
-    info
+    ;; format datetime
+    (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
     ))
+
+(defun blog-admin-backend--hexo-read-md-info (post)
+  "Read info of hexo markdown post"
+  (with-temp-buffer
+    (insert-file-contents post)
+    (let ((info nil))
+      (setq info (plist-put info :title
+                            (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
+      (plist-put info :date
+                 (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
+      info
+      )
+    ))
+
+(defun blog-admin-backend--hexo-read-org-info (post)
+  "Read info of hexo org post"
+  (blog-admin-backend--org-property-list post 'hexo-org))
 
 (blog-admin-backend-define 'hexo
          '(:scan-posts-func
