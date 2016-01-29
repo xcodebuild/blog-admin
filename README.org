@@ -1,7 +1,7 @@
 * blog-admin
 Write blog in emacs with hexo.
 * Preview
-[[http://i4.tietuku.com/b2754eaf5c233a7d.gif][preview]]
+[[http://i4.tietuku.com/b2754eaf5c233a7d.gif]]
 * Usage
 + ~(require 'blog-admin)~ first
 + ~M-x blog-admin-start~ to start this.
