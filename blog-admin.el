@@ -122,13 +122,8 @@
                                    (list (make-ctbl:cmodel
                                           :title "Date"
                                           :sorter 'ctbl:sort-string-lessp
-                                          :max-width 10
+                                          :min-width 10
                                           :align 'left)
-                                         (make-ctbl:cmodel
-                                          :title "Tags"
-                                          :align 'left
-                                          :max-width 10
-                                          :sorter 'ctbl:sort-string-lessp)
                                          (make-ctbl:cmodel
                                           :title "Publish"
                                           :align 'left

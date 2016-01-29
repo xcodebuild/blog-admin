@@ -45,7 +45,8 @@
     (mapcar (lambda (file)
               "Convert info into datesource"
               (let ((info (funcall read-info file)))
-                (list (plist-get info :date) (plist-get info :tags) (plist-get info :publish) (plist-get info :title) file)
+                ;; put file path at last for read from table
+                (list (plist-get info :date) (plist-get info :publish) (plist-get info :title) file)
                 )
               ) (funcall scan-posts))
     ))
@@ -79,7 +80,6 @@
 (org-export-define-derived-backend 'hexo-org 'html
   :options-alist
   '((:date "DATE" nil nil)
-    (:tags "TAGS" nil nil)
     (:title "TITLE" nil nil)))
 
 (defun blog-admin-backend--hexo-scan-posts ()
