@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 's)
+(require 'f)
 
 (defvar blog-admin-backend-plist nil
   "Backend blog-admin-backend-plist")
@@ -39,6 +40,9 @@
   "Default file type of new post, 'markdown or 'org ")
 (defvar blog-admin-backend-hexo-default-post-publish nil
   "`nil`->new post will be publish, `t`-> new post will be placed in draft")
+
+(defvar blog-admin-backend-hexo-posts-dir "source/_posts")
+(defvar blog-admin-backend-hexo-drafts-dir "source/_drafts")
 
 (defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
@@ -58,6 +62,11 @@
 (defun blog-admin-backend-define (keyword backend)
   "Put backend blog-admin-backend-define into blog-admin-backend-plist"
   (setq blog-admin-backend-plist (plist-put blog-admin-backend-plist keyword backend)))
+
+(defun blog-admin-backend-get-backend ()
+  "Return backend"
+  (plist-get blog-admin-backend-plist blog-admin-backend-type)
+  )
 
 ;; org
 (defun blog-admin-backend--org-property-list (filename org-backend)
@@ -93,8 +102,13 @@
           (lambda (append-path)
             "scan files with append-path"
             (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.\\(org\\|md\\|markdown\\)$"))
-          '("source/_posts" "source/_drafts")
+          (list blog-admin-backend-hexo-posts-dir blog-admin-backend-hexo-drafts-dir)
           )))
+
+(defun blog-admin-backend--hexo-is-in-drafts? (post)
+  "Return whether is post in drafts"
+  (s-starts-with?
+   (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) post))
 
 (defun blog-admin-backend--hexo-read-info (post)
   "Read info of hexo post"
@@ -104,15 +118,37 @@
                 ;; markdown post
                 (blog-admin-backend--hexo-read-md-info post))))
     ;; read if publish
-    (if (s-starts-with?
-         (blog-admin-backend--full-path "source/_posts") post)
+    (if (blog-admin-backend--hexo-is-in-drafts? post)
         ;; then
-        (plist-put info :publish "YES")
+        (plist-put info :publish "NO")
       ;; else
-      (plist-put info :publish "NO")
+      (plist-put info :publish "YES")
       )
     ;; format datetime
     (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
+    ))
+
+(defun blog-admin-backend--hexo-exchange-place (path)
+  "Drafts->posts, posts->drafts"
+  (if (f-exists? path)
+      (let* ((name (f-filename path)))
+        (if (blog-admin-backend--hexo-is-in-drafts? path)
+            ;; drafts->posts
+            (f-move (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) name)
+                    (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-posts-dir) name))
+          ;; posts->drafts
+          (f-move (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-posts-dir) name)
+                  (f-join (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) name))
+          ))))
+
+(defun blog-admin-backend--hexo-publish-or-unpublish ()
+  "Switch between publish and drafts"
+  (interactive)
+  (let* ((post (blog-admin--table-current-file))
+         (dirpath (f-no-ext post)))
+    (blog-admin-backend--hexo-exchange-place post)
+    (blog-admin-backend--hexo-exchange-place dirpath)
+    (blog-admin-refresh)
     ))
 
 (defun blog-admin-backend--hexo-read-md-info (post)
@@ -137,6 +173,8 @@
            blog-admin-backend--hexo-scan-posts
            :read-info-func
            blog-admin-backend--hexo-read-info
+           :publish-unpublish-func
+           blog-admin-backend--hexo-publish-or-unpublish
            ))
 
 

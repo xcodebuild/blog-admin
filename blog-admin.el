@@ -6,7 +6,7 @@
 ;; Keywords: tools, blog, org
 
 ;; Version: 0.1
-;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0"))
+;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -62,16 +62,20 @@
 ;; map
 (unless blog-admin-mode-map
   (setq blog-admin-mode-map (make-sparse-keymap))
+  (define-key blog-admin-mode-map (kbd "<up>") 'ctbl:navi-move-up)
+  (define-key blog-admin-mode-map (kbd "<down>") 'ctbl:navi-move-down)
+
   (define-key blog-admin-mode-map "d" 'blog-admin-delete-post)
+  (define-key blog-admin-mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
   (define-key blog-admin-mode-map "r" 'blog-admin-refresh)
   (setq blog-admin-mode-map
-        (blog-admin--merge-keymap ctbl:table-mode-map blog-admin-mode-map)))
+        (blog-admin--merge-keymap blog-admin-mode-map ctbl:table-mode-map)))
 
 
 ;; table
 
 (defun blog-admin--table-current-file ()
-  (nth 2 (ctbl:cp-get-selected-data-row blog-admin-table))
+  (nth 3 (ctbl:cp-get-selected-data-row blog-admin-table))
   )
 
 (defun blog-admin--table-click ()
