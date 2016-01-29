@@ -163,6 +163,8 @@ categories:
                              blog-admin-backend-hexo--read-info
                              :publish-unpublish-func
                              blog-admin-backend-hexo--publish-or-unpublish
+                             :new-post-func
+                             blog-admin-backend-hexo-new-post
                              ))
 
 (provide 'blog-admin-backend-hexo)

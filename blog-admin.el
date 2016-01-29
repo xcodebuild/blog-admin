@@ -67,6 +67,7 @@
 
   (define-key blog-admin-mode-map "d" 'blog-admin-delete-post)
   (define-key blog-admin-mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
+  (define-key blog-admin-mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
   (define-key blog-admin-mode-map "r" 'blog-admin-refresh)
   (setq blog-admin-mode-map
         (blog-admin--merge-keymap blog-admin-mode-map ctbl:table-mode-map)))
