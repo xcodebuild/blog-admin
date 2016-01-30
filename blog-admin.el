@@ -102,10 +102,10 @@
             keystr (if keysym (mapconcat 'key-description keysym ",") "No keybind")
             docstr (documentation symbol))
       (if docstr
-          (setq summary-list (cons (format "%10s ... %s (%s)"
+          (setq summary-list (cons (format "%10s ... %s"
                                            keystr
                                            (car (split-string docstr "\n"))
-                                           symbol)
+                                           )
                                    summary-list)))
       (setq symbols (cdr symbols)))
     summary-list))

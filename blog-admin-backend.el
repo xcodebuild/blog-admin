@@ -88,6 +88,28 @@
     (format-time-string "%Y-%m-%d" (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))
   )
 
+(org-export-define-derived-backend 'basic-org 'html
+  :options-alist
+  '((:date "DATE" nil nil)
+    (:title "TITLE" nil nil)))
+
+(defun blog-admin-backend---read-org-info (post)
+  "Read info of org post"
+  (blog-admin-backend--org-property-list post 'basic-org))
+
+(defun blog-admin-backend---read-md-info (post)
+  "Read info of markdown post"
+  (with-temp-buffer
+    (insert-file-contents post)
+    (let ((info nil))
+      (setq info (plist-put info :title
+                            (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
+      (plist-put info :date
+                 (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
+      info
+      )
+    ))
+
 
 (provide 'blog-admin-backend)
 ;;; blog-admin-backend.el ends here

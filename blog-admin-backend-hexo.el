@@ -46,10 +46,6 @@ categories:
 (defvar blog-admin-backend-hexo-drafts-dir "source/_drafts")
 
 ;; hexo define
-(org-export-define-derived-backend 'hexo-org 'html
-  :options-alist
-  '((:date "DATE" nil nil)
-    (:title "TITLE" nil nil)))
 
 (defun blog-admin-backend-hexo--scan-posts ()
   "Scan posts of hexo"
@@ -70,9 +66,9 @@ categories:
   "Read info of hexo post"
   (let ((info (if (s-ends-with? ".org" post)
                   ;; org post
-                  (blog-admin-backend-hexo--read-org-info post)
+                  (blog-admin-backend--read-org-info post)
                 ;; markdown post
-                (blog-admin-backend-hexo--read-md-info post))))
+                (blog-admin-backend--read-md-info post))))
     ;; read if publish
     (if (blog-admin-backend-hexo--is-in-drafts? post)
         ;; then
@@ -112,23 +108,6 @@ categories:
     (blog-admin-backend-hexo--exchange-place dirpath)
     (blog-admin-refresh)
     ))
-
-(defun blog-admin-backend-hexo--read-md-info (post)
-  "Read info of hexo markdown post"
-  (with-temp-buffer
-    (insert-file-contents post)
-    (let ((info nil))
-      (setq info (plist-put info :title
-                            (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
-      (plist-put info :date
-                 (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
-      info
-      )
-    ))
-
-(defun blog-admin-backend-hexo--read-org-info (post)
-  "Read info of hexo org post"
-  (blog-admin-backend--org-property-list post 'hexo-org))
 
 (defun blog-admin-backend-hexo-new-post (filename)
   "New hexo post"
