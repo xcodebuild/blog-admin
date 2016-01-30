@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'ox)
 (require 'blog-admin-backend)
 
 (defvar blog-admin-backend-hexo-template-org-post "#+TITLE: Title Here
