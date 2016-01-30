@@ -34,7 +34,6 @@
 #+DATE: %s
 #+TAGS:
 #+CATEGORIES:
-#+OPTIONS:     H:3 num:nil toc:nil \\n:nil ::t |:t ^:nil -:nil f:t *:t <:t
 "
   "template for org-page's org post")
 
