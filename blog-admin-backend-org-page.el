@@ -30,10 +30,9 @@
 (defvar blog-admin-backend-org-page-drafts "_drafts"
   "Default drafts directory for org-page")
 
-(defvar blog-admin-backend-org-page-template-org-post "#+TITLE: New Post
+(defvar blog-admin-backend-org-page-template-org-post "#+TITLE: %s
 #+DATE: %s
 #+TAGS:
-#+CATEGORIES:
 "
   "template for org-page's org post")
 
@@ -143,6 +142,7 @@
         (insert
          (format
           blog-admin-backend-org-page-template-org-post
+          (f-no-ext filename)
           (format-time-string "%Y-%m-%d" (current-time))
           ))
         (save-buffer)

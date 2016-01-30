@@ -26,7 +26,7 @@
 (require 'ox)
 (require 'blog-admin-backend)
 
-(defvar blog-admin-backend-hexo-template-org-post "#+TITLE: Title Here
+(defvar blog-admin-backend-hexo-template-org-post "#+TITLE: %s
 #+DATE: %s
 #+LAYOUT: post
 #+TAGS:
@@ -34,7 +34,7 @@
 "
   "template for hexo's org post")
 
-(defvar blog-admin-backend-hexo-template-md-post "title: Title here
+(defvar blog-admin-backend-hexo-template-md-post "title: %s
 date: %s
 tags:
 categories:
@@ -120,6 +120,7 @@ categories:
         (insert
          (format
           (if (s-ends-with? ".org" filename) blog-admin-backend-hexo-template-org-post blog-admin-backend-hexo-template-md-post)
+          (f-no-ext filename)
           (format-time-string "%Y-%m-%d" (current-time))
           ))
         (save-buffer)
