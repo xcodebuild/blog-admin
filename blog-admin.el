@@ -168,6 +168,7 @@
 
 ;; main
 
+;;;###autoload
 (defun blog-admin-start ()
   "Blog admin"
   (interactive)
