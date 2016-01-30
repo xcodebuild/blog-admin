@@ -55,7 +55,7 @@
 (defun blog-admin-backend-org-page--scan-posts ()
   "Scan posts of org-page"
   (if (not (f-exists? (blog-admin-backend--full-path blog-admin-backend-org-page-drafts)))
-      (f-mkdir (blog-admin-backend--full-path blog-admin-backend-org-page-drafts))
+      (f-mkdir (blog-admin-backend--full-path blog-admin-backend-org-page-drafts)))
   (apply 'append
          (mapcar
           (lambda (append-path)
