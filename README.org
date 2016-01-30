@@ -1,5 +1,5 @@
 * blog-admin
-Write blog in emacs with hexo.
+Write blog in emacs with hexo or org-page.
 * Preview
 [[http://i4.tietuku.com/b2754eaf5c233a7d.gif]]
 * Usage
@@ -16,4 +16,17 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
   (setq blog-admin-backend-type 'hexo)
   (setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
   (setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
+#+END_SRC
+
+* org-page
+
+[[https://github.com/kelvinh/org-page][org-page]] is pure emacs static blog generator.
+
+** configure
+#+BEGIN_SRC emacs-lisp
+  (setq blog-admin-backend-type 'org-page)
+  (setq blog-admin-backend-path "~/code/blog")
+  (setq blog-admin-backend-new-post-in-drafts t)
+  (setq blog-admin-backend-new-post-with-same-name-dir t)
+  (setq blog-admin-backend-org-page-drafts "_drafts") ;; directory to save draft
 #+END_SRC
