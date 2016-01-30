@@ -13,6 +13,7 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
 ** configure
 #+BEGIN_SRC emacs-lisp
   (setq blog-admin-backend-path "~/blog")
-  (setq blog-admin-backend-hexo-new-post-in-drafts t) ;; create new post in drafts by default
-  (setq blog-admin-backend-hexo-new-post-with-same-name-dir t) ;; create same-name directory with new post
+  (setq blog-admin-backend-type 'hexo)
+  (setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
+  (setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
 #+END_SRC

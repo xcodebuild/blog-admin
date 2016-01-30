@@ -25,15 +25,6 @@
 
 (require 'blog-admin-backend)
 
-(defvar blog-admin-backend-hexo-default-file-type 'markdown
-  "Default file type of new post, 'markdown or 'org ")
-
-(defvar blog-admin-backend-hexo-new-post-in-drafts nil
-  "`nil`->new post will be publish, `t`-> new post will be placed in drafts")
-
-(defvar blog-admin-backend-hexo-new-post-with-same-name-dir t
-  "`nil`->new post will be a single file, `t`-> new post will come with a same-name directory")
-
 (defvar blog-admin-backend-hexo-template-org-post "#+TITLE: Title Here
 #+DATE: %s
 #+LAYOUT: post
@@ -143,9 +134,9 @@ categories:
   (interactive "sPost's filename(new-post.org, new-post.md etc):")
   (if (or (s-ends-with? ".org" filename) (s-ends-with? ".md" filename))
       (progn
-        (if blog-admin-backend-hexo-new-post-with-same-name-dir
-            (f-mkdir (blog-admin-backend-hexo--file-path (f-no-ext filename) blog-admin-backend-hexo-new-post-in-drafts)))
-        (find-file (blog-admin-backend-hexo--file-path filename blog-admin-backend-hexo-new-post-in-drafts))
+        (if blog-admin-backend-new-post-with-same-name-dir
+            (f-mkdir (blog-admin-backend-hexo--file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
+        (find-file (blog-admin-backend-hexo--file-path filename blog-admin-backend-new-post-in-drafts))
         (insert
          (format
           (if (s-ends-with? ".org" filename) blog-admin-backend-hexo-template-org-post blog-admin-backend-hexo-template-md-post)

@@ -35,6 +35,14 @@
 (defvar blog-admin-backend-type 'hexo
   "Type of blog backend, options :hexo")
 
+(defvar blog-admin-backend-new-post-in-drafts nil
+  "`nil`->new post will be publish, `t`-> new post will be placed in drafts")
+
+(defvar blog-admin-backend-new-post-with-same-name-dir t
+  "`nil`->new post will be a single file, `t`-> new post will come with a same-name directory")
+
+
+
 (defun blog-admin-backend-build-datasource (keyword)
   "Build data source from backend defined"
   (let* ((blog-backend (plist-get blog-admin-backend-plist keyword))
