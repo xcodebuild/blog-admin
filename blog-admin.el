@@ -121,19 +121,11 @@ r   ... Refresh blog-admin
                                           :title "Title"
                                           :align 'left
                                           :min-width 40
-                                          :max-width 140)
+                                          :max-width 120)
                                          )))))
 
     (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
     ))
-
-
-(defun blog-admin-refresh ()
-  "Refresh *Blog*"
-  (interactive)
-  (when blog-admin-mode-buffer
-    (kill-buffer blog-admin-mode-buffer)
-    (blog-admin-start)))
 
 (defun blog-admin-delete-post ()
   "Delete post"
@@ -150,6 +142,13 @@ r   ... Refresh blog-admin
           (blog-admin-refresh)
           ))))
 
+(defun blog-admin-refresh ()
+  "Refresh *Blog*"
+  (interactive)
+  (when blog-admin-mode-buffer
+    (kill-buffer blog-admin-mode-buffer)
+    (blog-admin-load-map)
+    (blog-admin-start)))
 ;; main
 
 ;;;###autoload
@@ -160,14 +159,14 @@ r   ... Refresh blog-admin
   (switch-to-buffer blog-admin-mode-buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
+  (blog-admin-load-map)
   (blog-admin--table-build (blog-admin-backend-build-datasource blog-admin-backend-type) blog-admin-mode-map)
   (blog-admin-mode)
   )
 
 (define-derived-mode blog-admin-mode nil "Blog"
   "Major mode for blog-admin."
-  (set (make-local-variable 'buffer-read-only) t)
-  (blog-admin-load-map))
+  (set (make-local-variable 'buffer-read-only) t))
 
 (provide 'blog-admin)
 ;;; blog-admin.el ends here
