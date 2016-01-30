@@ -46,11 +46,12 @@
 
 (defun blog-admin-backend-org-page--categories ()
   "Return categories of org-page"
-  (let ((dir-list (f-directories blog-admin-backend-path)))
-    (dolist (x op/category-ignore-list)
-      (delete x dir-list))
-    dir-list
-    ))
+  (mapcar
+   'f-filename
+   (f-directories
+    blog-admin-backend-path
+    (lambda (dir) (not (member (f-filename dir) (append op/category-ignore-list '(".git")))))
+    )))
 
 (defun blog-admin-backend-org-page--scan-posts ()
   "Scan posts of org-page"

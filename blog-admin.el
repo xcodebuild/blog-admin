@@ -31,6 +31,7 @@
 (require 'org)
 (require 'ctable)
 (require 'blog-admin-backend-hexo)
+(require 'blog-admin-backend-org-page)
 
 (defvar blog-admin-mode-buffer nil
   "Main buffer of blog-admin")
