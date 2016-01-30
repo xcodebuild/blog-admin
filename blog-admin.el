@@ -60,7 +60,7 @@
 
 
 ;; map
-(unless blog-admin-mode-map
+(defun blog-admin-load-map ()
   (setq blog-admin-mode-map (make-sparse-keymap))
   (define-key blog-admin-mode-map (kbd "<up>") 'ctbl:navi-move-up)
   (define-key blog-admin-mode-map (kbd "<down>") 'ctbl:navi-move-down)
@@ -71,7 +71,6 @@
   (define-key blog-admin-mode-map "r" 'blog-admin-refresh)
   (setq blog-admin-mode-map
         (blog-admin--merge-keymap blog-admin-mode-map ctbl:table-mode-map)))
-
 
 ;; table
 
@@ -183,19 +182,7 @@
 (define-derived-mode blog-admin-mode nil "Blog"
   "Major mode for blog-admin."
   (set (make-local-variable 'buffer-read-only) t)
-  )
-
-;; (defun blog-admin-mode ()
-;;   "Major mode for blog-admin"
-;;   (kill-all-local-variables)
-;;   (setq truncate-lines t)
-;;   (use-local-map blog-admin-mode-map)
-;;   (setq major-mode 'blog-admin-mode
-;;         mode-name  "Blog")
-;;   (setq buffer-undo-list t
-;;         buffer-read-only t)
-;;   (run-hooks 'blog-admin-mode-hook))
-
+  (blog-admin-load-map))
 
 (provide 'blog-admin)
 ;;; blog-admin.el ends here
