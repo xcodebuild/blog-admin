@@ -31,6 +31,7 @@
 (require 'org)
 (require 'ctable)
 (require 'blog-admin-backend-hexo)
+(require 'blog-admin-backend-org-page)
 
 (setq blog-admin-backend-path "~/blog/")
 

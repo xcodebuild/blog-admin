@@ -27,17 +27,30 @@
 (require 'blog-admin-backend)
 (require 'f)
 
-(defvar blog-admin-backend-org-page-drafts "_drafts")
+(defvar blog-admin-backend-org-page-drafts "_drafts"
+  "Default drafts directory for org-page")
+
+(defvar blog-admin-backend-org-page-template-org-post "#+TITLE: New Post
+#+DATE: %s
+#+TAGS:
+#+CATEGORIES:
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+"
+  "template for org-page's org post")
+
 
 ;; work with org-page
 (eval-after-load 'org-page
-  (add-to-list 'op/category-ignore-list "_drafts"))
+  (lambda ()
+    (add-to-list 'op/category-ignore-list "_drafts")))
 
 (defun blog-admin-backend-org-page--categories ()
   "Return categories of org-page"
   (let ((dir-list (f-directories blog-admin-backend-path)))
     (dolist (x op/category-ignore-list)
-      (delete x dir-list))))
+      (delete x dir-list))
+    dir-list
+    ))
 
 (defun blog-admin-backend-org-page--scan-posts ()
   "Scan posts of org-page"
@@ -46,7 +59,7 @@
           (lambda (append-path)
             "scan files with append-path"
             (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.org$"))
-          (append (blog-admin-backend-org-page--categories) blog-admin-backend-org-page-drafts)
+          (append (blog-admin-backend-org-page--categories) (list blog-admin-backend-org-page-drafts))
           )
          ))
 
@@ -72,12 +85,29 @@
       (let* ((name (f-filename path)))
         (if (blog-admin-backend-hexo--is-in-drafts? path)
             ;; drafts->posts
-            (f-move (blog-admin-backend-hexo--file-path name t)
-                    (blog-admin-backend-hexo--file-path name nil))
+            (f-move (blog-admin-backend-org-page--file-path name t category)
+                    (blog-admin-backend-org-page--file-path name nil category))
           ;; posts->drafts
-          (f-move (blog-admin-backend-hexo--file-path name nil)
-                  (blog-admin-backend-hexo--file-path name t))
+          (f-move (blog-admin-backend-org-page--file-path name nil category)
+                  (blog-admin-backend-org-page--file-path name t category))
           ))))
+
+(defun blog-admin-backend-org-page--publish-or-unpublish ()
+  "Switch between publish and drafts"
+  (interactive)
+  (let* ((post (blog-admin--table-current-file))
+         (dirpath (f-no-ext post)))
+    (if (blog-admin-backend-org-page--is-in-drafts? post)
+        (progn (let ((category (blog-admin-backend-org-page--read-dir-in-ido)))
+                 (blog-admin-backend-hexo--exchange-place post category)
+                 (blog-admin-backend-hexo--exchange-place dirpath category)))
+      (progn
+        (blog-admin-backend-hexo--exchange-place post nil)
+        (blog-admin-backend-hexo--exchange-place dirpath nil))
+      )
+    (blog-admin-refresh)
+    ))
+
 
 (defun blog-admin-backend-org-page--read-info (post)
   "Read info of org-page post"
@@ -91,6 +121,25 @@
     (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
     ))
 
+(defun blog-admin-backend-org-page-new-post (filename)
+  "New org-page post"
+  (interactive "sPost's filename(new-post.org, new-post.md etc):")
+  (if (s-ends-with? ".org" filename)
+      (progn
+        (if blog-admin-backend-new-post-with-same-name-dir
+            (f-mkdir (blog-admin-backend-hexo--file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
+        (find-file (blog-admin-backend-hexo--file-path filename blog-admin-backend-new-post-in-drafts))
+        (insert
+         (format
+          blog-admin-backend-org-page-template-org-post
+          (format-time-string "%Y-%m-%d" (current-time))
+          ))
+        (save-buffer)
+        (kill-buffer)
+        (blog-admin-refresh))
+    (message "Post's filename must end with .org")
+    ))
+
 
 (blog-admin-backend-define 'org-page
                            '(:scan-posts-func
@@ -98,9 +147,9 @@
                              :read-info-func
                              blog-admin-backend-org-page--read-info
                              :publish-unpublish-func
-                             blog-admin-backend-hexo--publish-or-unpublish
+                             blog-admin-backend-org-page--publish-or-unpublish
                              :new-post-func
-                             blog-admin-backend-hexo-new-post
+                             blog-admin-backend-org-page-new-post
                              ))
 
 (provide 'blog-admin-backend-org-page)
