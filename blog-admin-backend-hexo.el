@@ -92,10 +92,10 @@ categories:
       (let* ((name (f-filename path)))
         (if (blog-admin-backend-hexo--is-in-drafts? path)
             ;; drafts->posts
-            (f-move (blog-admin-backend-hexo--file-path name t)
+            (f-move path
                     (blog-admin-backend-hexo--file-path name nil))
           ;; posts->drafts
-          (f-move (blog-admin-backend-hexo--file-path name nil)
+          (f-move path
                   (blog-admin-backend-hexo--file-path name t))
           ))))
 

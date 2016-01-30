@@ -34,7 +34,7 @@
 #+DATE: %s
 #+TAGS:
 #+CATEGORIES:
-#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+OPTIONS:     H:3 num:nil toc:nil \\n:nil ::t |:t ^:nil -:nil f:t *:t <:t
 "
   "template for org-page's org post")
 
@@ -76,7 +76,7 @@
 
 (defun blog-admin-backend-org-page--file-path (name in-drafts? category)
   (f-join (blog-admin-backend--full-path
-           (if in-drafts? blog-admin-backend-hexo-drafts-dir
+           (if in-drafts? blog-admin-backend-org-page-drafts
              category))
           name))
 
@@ -84,12 +84,12 @@
   "Drafts->posts, posts->drafts"
   (if (f-exists? path)
       (let* ((name (f-filename path)))
-        (if (blog-admin-backend-hexo--is-in-drafts? path)
+        (if (blog-admin-backend-org-page--is-in-drafts? path)
             ;; drafts->posts
-            (f-move (blog-admin-backend-org-page--file-path name t category)
+            (f-move path
                     (blog-admin-backend-org-page--file-path name nil category))
           ;; posts->drafts
-          (f-move (blog-admin-backend-org-page--file-path name nil category)
+          (f-move path
                   (blog-admin-backend-org-page--file-path name t category))
           ))))
 
@@ -100,11 +100,11 @@
          (dirpath (f-no-ext post)))
     (if (blog-admin-backend-org-page--is-in-drafts? post)
         (progn (let ((category (blog-admin-backend-org-page--read-dir-in-ido)))
-                 (blog-admin-backend-hexo--exchange-place post category)
-                 (blog-admin-backend-hexo--exchange-place dirpath category)))
+                 (blog-admin-backend-org-page--exchange-place post category)
+                 (blog-admin-backend-org-page--exchange-place dirpath category)))
       (progn
-        (blog-admin-backend-hexo--exchange-place post nil)
-        (blog-admin-backend-hexo--exchange-place dirpath nil))
+        (blog-admin-backend-org-page--exchange-place post nil)
+        (blog-admin-backend-org-page--exchange-place dirpath nil))
       )
     (blog-admin-refresh)
     ))
@@ -124,12 +124,21 @@
 
 (defun blog-admin-backend-org-page-new-post (filename)
   "New org-page post"
-  (interactive "sPost's filename(new-post.org, new-post.md etc):")
+  (interactive "sPost's filename(new-post.org etc):")
   (if (s-ends-with? ".org" filename)
       (progn
-        (if blog-admin-backend-new-post-with-same-name-dir
-            (f-mkdir (blog-admin-backend-hexo--file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
-        (find-file (blog-admin-backend-hexo--file-path filename blog-admin-backend-new-post-in-drafts))
+        (if blog-admin-backend-new-post-in-drafts
+            (progn
+              (if blog-admin-backend-new-post-with-same-name-dir
+                  (f-mkdir (blog-admin-backend-org-page--file-path (f-no-ext filename) t nil)))
+              (find-file (blog-admin-backend-org-page--file-path filename t nil))
+              )
+          (let ((categroy (blog-admin-backend-org-page--read-dir-in-ido)))
+            (if blog-admin-backend-new-post-with-same-name-dir
+                (f-mkdir (blog-admin-backend-org-page--file-path (f-no-ext filename) t categroy)))
+            (find-file (blog-admin-backend-org-page--file-path filename t categroy))
+            )
+          )
         (insert
          (format
           blog-admin-backend-org-page-template-org-post
