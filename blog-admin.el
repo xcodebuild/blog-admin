@@ -46,6 +46,18 @@
 (defvar blog-admin-table nil
   "blog admin summary table")
 
+(defvar blog-admin--table-help
+  "Blog
+
+s   ... Switch between publish and drafts
+d   ... Delete current post
+w   ... Write new post
+RET ... Open current post
+r   ... Refresh blog-admin
+
+"
+  "Help of table")
+
 (defun blog-admin--merge-keymap (keymap1 keymap2)
   (append keymap1
           (delq nil
@@ -80,35 +92,10 @@
   "Click event for table"
   (find-file (blog-admin--table-current-file)))
 
-(defun blog-admin--table-header (&optional title)
-  (concat
-   (format "%s\n" (or title "Blog"))
-   (mapconcat
-    'identity
-    (blog-admin--table-help
-     (cl-remove-duplicates
-      (mapcar 'cdr (cdr blog-admin-mode-map)))
-     blog-admin-mode-map)
-    "\n")
-   "\n\n\n"))
 
-(defun blog-admin--table-help (symbols &optional keymap)
-  (let (symbol keysym keystr docstr summary-list)
-    (while (setq symbol (car symbols))
-      (setq keysym (where-is-internal symbol (or keymap (current-local-map)) nil)
-            keystr (if keysym (mapconcat 'key-description keysym ",") "No keybind")
-            docstr (documentation symbol))
-      (if docstr
-          (setq summary-list (cons (format "%10s ... %s"
-                                           keystr
-                                           (car (split-string docstr "\n"))
-                                           )
-                                   summary-list)))
-      (setq symbols (cdr symbols)))
-    summary-list))
 
 (defun blog-admin--table-build (contents keymap)
-  (insert (blog-admin--table-header))
+  (insert blog-admin--table-help)
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
     (save-excursion (setq blog-admin-table (ctbl:create-table-component-region
