@@ -93,11 +93,11 @@
   '((:date "DATE" nil nil)
     (:title "TITLE" nil nil)))
 
-(defun blog-admin-backend---read-org-info (post)
+(defun blog-admin-backend--read-org-info (post)
   "Read info of org post"
   (blog-admin-backend--org-property-list post 'basic-org))
 
-(defun blog-admin-backend---read-md-info (post)
+(defun blog-admin-backend--read-md-info (post)
   "Read info of markdown post"
   (with-temp-buffer
     (insert-file-contents post)

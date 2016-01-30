@@ -180,16 +180,21 @@
   (blog-admin-mode)
   )
 
-(defun blog-admin-mode ()
-  "Major mode for blog-admin"
-  (kill-all-local-variables)
-  (setq truncate-lines t)
-  (use-local-map blog-admin-mode-map)
-  (setq major-mode 'blog-admin-mode
-        mode-name  "Blog")
-  (setq buffer-undo-list t
-        buffer-read-only t)
-  (run-hooks 'blog-admin-mode-hook))
+(define-derived-mode blog-admin-mode nil "Blog"
+  "Major mode for blog-admin."
+  (set (make-local-variable 'buffer-read-only) t)
+  )
+
+;; (defun blog-admin-mode ()
+;;   "Major mode for blog-admin"
+;;   (kill-all-local-variables)
+;;   (setq truncate-lines t)
+;;   (use-local-map blog-admin-mode-map)
+;;   (setq major-mode 'blog-admin-mode
+;;         mode-name  "Blog")
+;;   (setq buffer-undo-list t
+;;         buffer-read-only t)
+;;   (run-hooks 'blog-admin-mode-hook))
 
 
 (provide 'blog-admin)
