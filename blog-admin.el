@@ -1,9 +1,9 @@
-;;; blog-admin.el --- Blog admin for emacs with hexo supported  -*- lexical-binding: t; -*-
+;;; blog-admin.el --- Blog admin for emacs with hexo/org-page supported  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2016
 
 ;; Author:  code.falling@gmail.com
-;; Keywords: tools, blog, org
+;; Keywords: tools, blog, org, hexo, org-page
 
 ;; Version: 0.1
 ;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3"))
