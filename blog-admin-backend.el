@@ -91,8 +91,6 @@
       (format-time-string "%Y-%m-%d"
                           (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))))
 
-(equal (parse-time-string "1994-12-3") '(nil nil nil nil nil nil nil nil nil))
-
 (org-export-define-derived-backend 'basic-org 'html
   :options-alist
   '((:date "DATE" nil nil)
