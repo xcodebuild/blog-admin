@@ -8,15 +8,13 @@ Write blog in emacs with hexo or org-page.
 2. ~(add-to-load-path "/path/to/blog-admin")~
 3. ~(require 'blog-admin)~
 ** Spacemacs
-1. Add
 #+BEGIN_SRC emacs-lisp
   (blog-admin :location (recipe
                          :fetcher github
                          :repo "codefalling/blog-admin"))
 #+END_SRC
-in your layer's packages.
+in your layer's packages, then
 
-2. 
 #+BEGIN_SRC emacs-lisp
   (use-package blog-admin
     :init
