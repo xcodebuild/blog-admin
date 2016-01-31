@@ -4,7 +4,7 @@ Write blog in emacs with hexo or org-page.
 [[https://cloud.githubusercontent.com/assets/5436704/12700452/1aa686ea-c81e-11e5-92c6-5cd5e810ba35.gif]]
 * Install
 ** Manual
-1. ~git clone https://github.com/CodeFalling/blog-admin /path/to/blog-admin~
+1. ~git clone https://github.com/CodeFalling/blog-admin /path/to/blog-admin -b master~
 2. ~(add-to-load-path "/path/to/blog-admin")~
 3. ~(require 'blog-admin)~
 ** Spacemacs
