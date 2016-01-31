@@ -146,9 +146,12 @@ r   ... Refresh blog-admin
   "Refresh *Blog*"
   (interactive)
   (when blog-admin-mode-buffer
-    (kill-buffer blog-admin-mode-buffer)
-    (blog-admin-load-map)
-    (blog-admin-start)))
+    (let ((old-point (point)))
+      (kill-buffer blog-admin-mode-buffer)
+      (blog-admin-load-map)
+      (blog-admin-start)
+      (goto-char old-point)
+      )))
 ;; main
 
 ;;;###autoload
