@@ -25,7 +25,6 @@
 ;;; Code:
 (require 's)
 (require 'f)
-(require 'blog-admin)
 
 (defvar blog-admin-backend-plist nil
   "Backend blog-admin-backend-plist")
