@@ -129,6 +129,11 @@
       (progn
         (if blog-admin-backend-new-post-in-drafts
             (progn
+              ;; mkdir _drafts if not exists
+              (if (not
+                   (f-exists? (f-join blog-admin-backend-path blog-admin-backend-org-page-drafts)))
+                  (f-mkdir (f-join blog-admin-backend-path blog-admin-backend-org-page-drafts))
+                )
               (if blog-admin-backend-new-post-with-same-name-dir
                   (f-mkdir (blog-admin-backend-org-page--file-path (f-no-ext filename) t nil)))
               (find-file (blog-admin-backend-org-page--file-path filename t nil))
