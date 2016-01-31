@@ -55,6 +55,6 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
 
 * Thanks
 1. I stole idea that operating posts in table from [[https://github.com/yoshinari-nomura/org-octopress][org-octopress]].
-2. The table is build on a awesome library: [[https://github.com/kiwanami/emacs-ctable][emacs-ctable]].
+2. The table build on a awesome library: [[https://github.com/kiwanami/emacs-ctable][emacs-ctable]].
 3. Thanks for [[https://github.com/magnars/s.el][s]] and [[https://github.com/rejeep/f.el][f]] who provide a modern API for emacs.
 
