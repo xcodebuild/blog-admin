@@ -71,6 +71,7 @@
 (defun blog-admin-backend--org-property-list (filename org-backend)
   (if filename
       (with-temp-buffer
+
         (insert-file-contents filename)
         (org-mode)
         (org-export-get-environment org-backend))))
@@ -83,8 +84,10 @@
     (file-name-as-directory blog-admin-backend-path)
     append-path)))
 
-(defun blog-admin-backend--format-datetime (datetime-str)
-  (let ((l (parse-time-string datetime-str)))
+(defun blog-admin-backend--format-datetime (datetime)
+  (let* ((datetime-str (if (stringp datetime) datetime
+                         (car datetime)))
+         (l (parse-time-string datetime-str)))
     (if (equal l
                '(nil nil nil nil nil nil nil nil nil)) ;; can't parse
         "Can't Parse"
