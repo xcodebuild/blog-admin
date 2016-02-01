@@ -1,6 +1,6 @@
 * blog-admin
 [[https://travis-ci.org/CodeFalling/blog-admin][https://travis-ci.org/CodeFalling/blog-admin.svg]]
-[[https://badges.gitter.im/CodeFalling/blog-admin.svg][https://gitter.im/CodeFalling/blog-admin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge]]
+[[https://gitter.im/CodeFalling/blog-admin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge][https://badges.gitter.im/CodeFalling/blog-admin.svg]]
 
 Write blog in emacs with hexo or org-page.
 * Preview
