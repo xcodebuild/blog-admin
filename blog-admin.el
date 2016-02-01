@@ -80,7 +80,7 @@ r   ... Refresh blog-admin
   (define-key mode-map (kbd "<up>") 'ctbl:navi-move-up)
   (define-key mode-map (kbd "<down>") 'ctbl:navi-move-down)
 
-  (define-key mode-map "d" 'delete-post)
+  (define-key mode-map "d" #'delete-post)
   (define-key mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
   (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
   (define-key mode-map "r" 'refresh)
