@@ -32,7 +32,13 @@ This plugin is not available from melpa for now.Recipe is waiting for merge: htt
 + ~(require 'blog-admin)~ first
 + ~M-x blog-admin-start~ to start this.
 + ~d~ to delete current post
-+ ~w~ to 
++ ~w~ to write new post
++ ~s~ to switch between draft and categories
+
+** Open post after create new post
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'blog-admin-backend-after-new-post-hook 'find-file)
+#+END_SRC
 * hexo
 ** orgmode & markdown
 Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.But this plugin *do nothing about render*.If you want to make orgmode work with hexo,you'd better use [[https://github.com/CodeFalling/hexo-renderer-org][hexo-renderer-org]].
