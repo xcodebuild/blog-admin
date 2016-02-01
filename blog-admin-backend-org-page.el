@@ -129,48 +129,45 @@
   (interactive "sPost's filename(new-post.org etc):")
   (if (s-ends-with? ".org" filename)
       (progn
-        (if blog-admin-backend-new-post-in-drafts
-            (progn
-              ;; mkdir _drafts if not exists
-              (if (not
-                   (f-exists? (f-join blog-admin-backend-path drafts)))
-                  (f-mkdir (f-join blog-admin-backend-path drafts))
-                )
-              (if blog-admin-backend-new-post-with-same-name-dir
-                  (f-mkdir (-file-path (f-no-ext filename) t nil)))
-              (find-file (-file-path filename t nil))
-              )
-          (let ((categroy (-read-dir-in-ido)))
-            (if blog-admin-backend-new-post-with-same-name-dir
-                (f-mkdir (-file-path (f-no-ext filename) t categroy)))
-            (find-file (-file-path filename t categroy))
-            )
+        ;; mkdir _drafts if not exists
+        (if (not
+             (f-exists? (f-join blog-admin-backend-path drafts)))
+            (f-mkdir (f-join blog-admin-backend-path drafts)))
+
+        (let ((file-path  (if blog-admin-backend-new-post-in-drafts
+                              (-file-path filename t nil)
+                            (-file-path filename t (-read-dir-in-ido))
+                            )))
+          (if blog-admin-backend-new-post-with-same-name-dir
+              (f-mkdir (f-no-ext file-path)))
+          (find-file file-path)
+          (insert
+           (format
+            template-org-post
+            (f-no-ext filename)
+            (format-time-string "%Y-%m-%d" (current-time))
+            ))
+          (save-buffer)
+          (kill-buffer)
+          (blog-admin-refresh)
+          (run-hook-with-args 'blog-admin-backend-after-new-post-hook file-path)
           )
-        (insert
-         (format
-          template-org-post
-          (f-no-ext filename)
-          (format-time-string "%Y-%m-%d" (current-time))
-          ))
-        (save-buffer)
-        (kill-buffer)
-        (blog-admin-refresh))
-    (message "Post's filename must end with .org")
-    ))
+        (message "Post's filename must end with .org")
+        )))
 
 
-(blog-admin-backend-define 'org-page
-                           `(:scan-posts-func
-                             ,#'-scan-posts
-                             :read-info-func
-                             ,#'-read-info
-                             :publish-unpublish-func
-                             ,#'publish-or-unpublish
-                             :new-post-func
-                             ,#'new-post
-                             ))
+  (blog-admin-backend-define 'org-page
+                             `(:scan-posts-func
+                               ,#'-scan-posts
+                               :read-info-func
+                               ,#'-read-info
+                               :publish-unpublish-func
+                               ,#'publish-or-unpublish
+                               :new-post-func
+                               ,#'new-post
+                               ))
 
-                           ) ;; namespace blog-admin-backend-org-page end here
+  ) ;; namespace blog-admin-backend-org-page end here
 
 (provide 'blog-admin-backend-org-page)
 ;;; blog-admin-backend-org-page.el ends here
