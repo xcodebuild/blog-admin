@@ -6,6 +6,8 @@
     (delete-directory sandbox-path t))
 (setq user-emacs-directory sandbox-path)
 
+(toggle-debug-on-error)
+
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.milkbox.net/packages/") t)
@@ -15,6 +17,7 @@
 (package-install 's)
 (package-install 'f)
 (package-install 'ctable)
+(package-install 'names)
 
 (require 'cl) ;; for assert
 (require 'ert)
@@ -22,25 +25,29 @@
 (add-to-list 'load-path "./")
 (require 'blog-admin)
 
-;; ready for test
-(f-mkdir blog-path-org-page)
-(f-mkdir blog-path-hexo)
-(toggle-debug-on-error)
 
 ;; test org-page
+(f-mkdir blog-path-org-page)
 
 (package-install 'org-page)
 (require 'org-page)
 
+;; just some startup configuration
 (setq blog-admin-backend-type 'org-page)
 (setq blog-admin-backend-path blog-path-org-page)
 (setq blog-admin-backend-org-page-drafts "_drafts")
-
+(setq blog-admin-backend-new-post-in-drafts t)
+(setq blog-admin-backend-new-post-with-same-name-dir t)
 (blog-admin-start)
 
 (ert-deftest org-page-new-post-in-drafts-same-dir ()
+  (setq blog-admin-backend-type 'org-page)
+  (setq blog-admin-backend-path blog-path-org-page)
+  (setq blog-admin-backend-org-page-drafts "_drafts")
   (setq blog-admin-backend-new-post-in-drafts t)
   (setq blog-admin-backend-new-post-with-same-name-dir t)
+  (blog-admin-refresh)
+
   (blog-admin-backend-org-page-new-post "test.org")
   (should (f-exists? (f-join blog-path-org-page "_drafts/test.org")))
   (should (f-exists? (f-join blog-path-org-page "_drafts/test")))
@@ -51,8 +58,13 @@
 ;; TODO:fix this
 
 (ert-deftest org-page-new-post-in-drafts-no-same-dir ()
+  (setq blog-admin-backend-type 'org-page)
+  (setq blog-admin-backend-path blog-path-org-page)
+  (setq blog-admin-backend-org-page-drafts "_drafts")
   (setq blog-admin-backend-new-post-in-drafts t)
   (setq blog-admin-backend-new-post-with-same-name-dir nil)
+  (blog-admin-refresh)
+
   (blog-admin-backend-org-page-new-post "test.org")
   (should (f-exists? (f-join blog-path-org-page "_drafts/test.org")))
   (should (not (f-exists? (f-join blog-path-org-page "_drafts/test"))))
@@ -60,4 +72,42 @@
   )
 
 
+;; hexo
+
+(f-mkdir blog-path-hexo)
+(f-mkdir (f-join blog-path-hexo "source"))
+(f-mkdir (f-join blog-path-hexo "source" "_posts"))
+(f-mkdir (f-join blog-path-hexo "source" "_drafts"))
+
+
+(ert-deftest hexo-new-post-in-drafts-same-dir ()
+  (setq blog-admin-backend-type 'hexo)
+  (setq blog-admin-backend-path blog-path-hexo)
+  (setq blog-admin-backend-new-post-in-drafts t)
+  (setq blog-admin-backend-new-post-with-same-name-dir t)
+  (blog-admin-refresh)
+
+  (blog-admin-backend-hexo-new-post "test.org")
+  (should (f-exists? (f-join blog-path-hexo "source/_drafts/test.org")))
+  (should (f-exists? (f-join blog-path-hexo "source/_drafts/test")))
+  (f-delete (f-join blog-path-hexo "source/_drafts/test.org"))
+  (f-delete (f-join blog-path-hexo "source/_drafts/test"))
+  )
+
+(ert-deftest hexo-new-post-in-drafts-no-same-dir ()
+  (setq blog-admin-backend-type 'hexo)
+  (setq blog-admin-backend-path blog-path-hexo)
+  (setq blog-admin-backend-new-post-in-drafts t)
+  (setq blog-admin-backend-new-post-with-same-name-dir nil)
+  (blog-admin-refresh)
+
+  (blog-admin-backend-hexo-new-post "test.org")
+  (should (f-exists? (f-join blog-path-hexo "source/_drafts/test.org")))
+  (should (not (f-exists? (f-join blog-path-hexo "source/_drafts/test"))))
+  (f-delete (f-join blog-path-hexo "source/_drafts/test.org") t)
+  )
+
+
+
+;; begin test
 (ert-run-tests-batch-and-exit)

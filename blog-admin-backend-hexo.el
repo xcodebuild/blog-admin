@@ -25,8 +25,11 @@
 
 (require 'ox)
 (require 'blog-admin-backend)
+(require 'names)
 
-(defvar blog-admin-backend-hexo-template-org-post "#+TITLE: %s
+(define-namespace blog-admin-backend-hexo-
+
+(defvar template-org-post "#+TITLE: %s
 #+DATE: %s
 #+LAYOUT: post
 #+TAGS:
@@ -34,7 +37,7 @@
 "
   "template for hexo's org post")
 
-(defvar blog-admin-backend-hexo-template-md-post "title: %s
+(defvar template-md-post "title: %s
 date: %s
 tags:
 categories:
@@ -42,27 +45,27 @@ categories:
 "
   "template for hexo's markdown post")
 
-(defvar blog-admin-backend-hexo-posts-dir "source/_posts")
-(defvar blog-admin-backend-hexo-drafts-dir "source/_drafts")
+(defvar posts-dir "source/_posts")
+(defvar drafts-dir "source/_drafts")
 
 ;; hexo define
 
-(defun blog-admin-backend-hexo--scan-posts ()
+(defun -scan-posts ()
   "Scan posts of hexo"
   (apply 'append
          (mapcar
           (lambda (append-path)
             "scan files with append-path"
             (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.\\(org\\|md\\|markdown\\)$"))
-          (list blog-admin-backend-hexo-posts-dir blog-admin-backend-hexo-drafts-dir)
+          (list posts-dir drafts-dir)
           )))
 
-(defun blog-admin-backend-hexo--is-in-drafts? (post)
+(defun -is-in-drafts? (post)
   "Return whether is post in drafts"
   (s-starts-with?
-   (blog-admin-backend--full-path blog-admin-backend-hexo-drafts-dir) post))
+   (blog-admin-backend--full-path drafts-dir) post))
 
-(defun blog-admin-backend-hexo--read-info (post)
+(defun -read-info (post)
   "Read info of hexo post"
   (let ((info (if (s-ends-with? ".org" post)
                   ;; org post
@@ -70,7 +73,7 @@ categories:
                 ;; markdown post
                 (blog-admin-backend--read-md-info post))))
     ;; read if publish
-    (if (blog-admin-backend-hexo--is-in-drafts? post)
+    (if (-is-in-drafts? post)
         ;; then
         (plist-put info :publish "NO")
       ;; else
@@ -80,46 +83,46 @@ categories:
     (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
     ))
 
-(defun blog-admin-backend-hexo--file-path (name in-drafts?)
+(defun -file-path (name in-drafts?)
   (f-join (blog-admin-backend--full-path 
-           (if in-drafts? blog-admin-backend-hexo-drafts-dir
-             blog-admin-backend-hexo-posts-dir))
+           (if in-drafts? drafts-dir
+             posts-dir))
           name))
 
-(defun blog-admin-backend-hexo--exchange-place (path)
+(defun -exchange-place (path)
   "Drafts->posts, posts->drafts"
   (if (f-exists? path)
       (let* ((name (f-filename path)))
-        (if (blog-admin-backend-hexo--is-in-drafts? path)
+        (if (-is-in-drafts? path)
             ;; drafts->posts
             (f-move path
-                    (blog-admin-backend-hexo--file-path name nil))
+                    (-file-path name nil))
           ;; posts->drafts
           (f-move path
-                  (blog-admin-backend-hexo--file-path name t))
+                  (-file-path name t))
           ))))
 
-(defun blog-admin-backend-hexo--publish-or-unpublish ()
+(defun -publish-or-unpublish ()
   "Switch between publish and drafts"
   (interactive)
   (let* ((post (blog-admin--table-current-file))
          (dirpath (f-no-ext post)))
-    (blog-admin-backend-hexo--exchange-place post)
-    (blog-admin-backend-hexo--exchange-place dirpath)
+    (-exchange-place post)
+    (-exchange-place dirpath)
     (blog-admin-refresh)
     ))
 
-(defun blog-admin-backend-hexo-new-post (filename)
+(defun new-post (filename)
   "New hexo post"
   (interactive "sPost's filename(new-post.org, new-post.md etc):")
   (if (or (s-ends-with? ".org" filename) (s-ends-with? ".md" filename))
       (progn
         (if blog-admin-backend-new-post-with-same-name-dir
-            (f-mkdir (blog-admin-backend-hexo--file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
-        (find-file (blog-admin-backend-hexo--file-path filename blog-admin-backend-new-post-in-drafts))
+            (f-mkdir (-file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
+        (find-file (-file-path filename blog-admin-backend-new-post-in-drafts))
         (insert
          (format
-          (if (s-ends-with? ".org" filename) blog-admin-backend-hexo-template-org-post blog-admin-backend-hexo-template-md-post)
+          (if (s-ends-with? ".org" filename) template-org-post template-md-post)
           (f-no-ext filename)
           (format-time-string "%Y-%m-%d" (current-time))
           ))
@@ -130,15 +133,17 @@ categories:
     ))
 
 (blog-admin-backend-define 'hexo
-                           '(:scan-posts-func
-                             blog-admin-backend-hexo--scan-posts
+                           `(:scan-posts-func
+                             ,#'-scan-posts
                              :read-info-func
-                             blog-admin-backend-hexo--read-info
+                             ,#'-read-info
                              :publish-unpublish-func
-                             blog-admin-backend-hexo--publish-or-unpublish
+                             ,#'-publish-or-unpublish
                              :new-post-func
-                             blog-admin-backend-hexo-new-post
+                             ,#'new-post
                              ))
+
+) ;; namespace blog-admin-backend-hexo end here
 
 (provide 'blog-admin-backend-hexo)
 ;;; blog-admin-backend-hexo.el ends here

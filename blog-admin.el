@@ -6,7 +6,7 @@
 ;; Keywords: tools, blog, org, hexo, org-page
 
 ;; Version: 0.1
-;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3"))
+;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3") (name "20151201.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,23 +30,28 @@
 ;;; Code:
 (require 'org)
 (require 'ctable)
+(require 'names)
+
 (require 'blog-admin-backend-hexo)
 (require 'blog-admin-backend-org-page)
 
-(defvar blog-admin-mode-buffer nil
+(define-namespace blog-admin-
+;; namespace blog-admin
+
+(defvar mode-buffer nil
   "Main buffer of blog-admin")
 
-(defvar blog-admin-mode-hook nil
-  "Hooks for blog-admin-mode")
+(defvar mode-hook nil
+  "Hooks for mode")
 
 ;; keymap
-(defvar blog-admin-mode-map nil
-  "Keymap for blog-admin-mode")
+(defvar mode-map nil
+  "Keymap for mode")
 
-(defvar blog-admin-table nil
+(defvar table nil
   "blog admin summary table")
 
-(defvar blog-admin--table-help
+(defconst -table-help
   "Blog
 
 s   ... Switch between publish and drafts
@@ -58,7 +63,7 @@ r   ... Refresh blog-admin
 "
   "Help of table")
 
-(defun blog-admin--merge-keymap (keymap1 keymap2)
+(defun -merge-keymap (keymap1 keymap2)
   (append keymap1
           (delq nil
                 (mapcar
@@ -70,67 +75,67 @@ r   ... Refresh blog-admin
 
 
 ;; map
-(defun blog-admin-load-map ()
-  (setq blog-admin-mode-map (make-sparse-keymap))
-  (define-key blog-admin-mode-map (kbd "<up>") 'ctbl:navi-move-up)
-  (define-key blog-admin-mode-map (kbd "<down>") 'ctbl:navi-move-down)
+(defun load-map ()
+  (setq mode-map (make-sparse-keymap))
+  (define-key mode-map (kbd "<up>") 'ctbl:navi-move-up)
+  (define-key mode-map (kbd "<down>") 'ctbl:navi-move-down)
 
-  (define-key blog-admin-mode-map "d" 'blog-admin-delete-post)
-  (define-key blog-admin-mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
-  (define-key blog-admin-mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
-  (define-key blog-admin-mode-map "r" 'blog-admin-refresh)
-  (setq blog-admin-mode-map
-        (blog-admin--merge-keymap blog-admin-mode-map ctbl:table-mode-map)))
+  (define-key mode-map "d" 'delete-post)
+  (define-key mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
+  (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
+  (define-key mode-map "r" 'refresh)
+  (setq mode-map
+        (-merge-keymap mode-map ctbl:table-mode-map)))
 
 ;; table
 
-(defun blog-admin--table-current-file ()
-  (nth 3 (ctbl:cp-get-selected-data-row blog-admin-table))
+(defun -table-current-file ()
+  (nth 3 (ctbl:cp-get-selected-data-row table))
   )
 
-(defun blog-admin--table-click ()
+(defun -table-click ()
   "Click event for table"
-  (find-file (blog-admin--table-current-file)))
+  (find-file (-table-current-file)))
 
 
 
-(defun blog-admin--table-build (contents keymap)
-  (insert blog-admin--table-help)
+(defun -table-build (contents keymap)
+  (insert -table-help)
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
-    (save-excursion (setq blog-admin-table (ctbl:create-table-component-region
-                                  :param param
-                                  :width  nil
-                                  :height nil
-                                  :keymap keymap
-                                  :model
-                                  (make-ctbl:model
-                                   :data contents
-                                   :sort-state '(-1 2)
-                                   :column-model
-                                   (list (make-ctbl:cmodel
-                                          :title "Date"
-                                          :sorter 'ctbl:sort-string-lessp
-                                          :min-width 10
-                                          :align 'left)
-                                         (make-ctbl:cmodel
-                                          :title "Publish"
-                                          :align 'left
-                                          :sorter 'ctbl:sort-string-lessp)
-                                         (make-ctbl:cmodel
-                                          :title "Title"
-                                          :align 'left
-                                          :min-width 40
-                                          :max-width 120)
-                                         )))))
+    (save-excursion (setq table (ctbl:create-table-component-region
+                                 :param param
+                                 :width  nil
+                                 :height nil
+                                 :keymap keymap
+                                 :model
+                                 (make-ctbl:model
+                                  :data contents
+                                  :sort-state '(-1 2)
+                                  :column-model
+                                  (list (make-ctbl:cmodel
+                                         :title "Date"
+                                         :sorter 'ctbl:sort-string-lessp
+                                         :min-width 10
+                                         :align 'left)
+                                        (make-ctbl:cmodel
+                                         :title "Publish"
+                                         :align 'left
+                                         :sorter 'ctbl:sort-string-lessp)
+                                        (make-ctbl:cmodel
+                                         :title "Title"
+                                         :align 'left
+                                         :min-width 40
+                                         :max-width 120)
+                                        )))))
 
-    (ctbl:cp-add-click-hook blog-admin-table 'blog-admin--table-click)
+    (ctbl:cp-add-click-hook table '-table-click)
     ))
 
-(defun blog-admin-delete-post ()
+(defun delete-post ()
   "Delete post"
   (interactive)
-  (let ( (file-path (blog-admin--table-current-file)) )
+  (let ( (file-path (-table-current-file)) )
     (if (y-or-n-p (format "Do you really want to delete %s" file-path))
         (progn
           (delete-file file-path)
@@ -139,37 +144,39 @@ r   ... Refresh blog-admin
             (if (file-exists-p dir-path)
                 (delete-directory dir-path t))
             )
-          (blog-admin-refresh)
+          (refresh)
           ))))
 
-(defun blog-admin-refresh ()
+(defun refresh ()
   "Refresh *Blog*"
   (interactive)
-  (when blog-admin-mode-buffer
+  (when mode-buffer
     (let ((old-point (point)))
-      (kill-buffer blog-admin-mode-buffer)
-      (blog-admin-load-map)
-      (blog-admin-start)
+      (kill-buffer mode-buffer)
+      (load-map)
+      (start)
       (goto-char old-point)
       )))
 ;; main
 
-;;;###autoload
-(defun blog-admin-start ()
+:autoload
+(defun start ()
   "Blog admin"
   (interactive)
-  (setq blog-admin-mode-buffer (get-buffer-create "*Blog*"))
-  (switch-to-buffer blog-admin-mode-buffer)
+  (setq mode-buffer (get-buffer-create "*Blog*"))
+  (switch-to-buffer mode-buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
-  (blog-admin-load-map)
-  (blog-admin--table-build (blog-admin-backend-build-datasource blog-admin-backend-type) blog-admin-mode-map)
-  (blog-admin-mode)
+  (load-map)
+  (-table-build (blog-admin-backend-build-datasource blog-admin-backend-type) mode-map)
+  (mode)
   )
 
-(define-derived-mode blog-admin-mode nil "Blog"
+(define-derived-mode mode nil "Blog"
   "Major mode for blog-admin."
   (set (make-local-variable 'buffer-read-only) t))
+
+) ;; namespace blog-admin end here
 
 (provide 'blog-admin)
 ;;; blog-admin.el ends here
