@@ -25,27 +25,29 @@
 ;;; Code:
 (require 's)
 (require 'f)
+(require 'names)
 
-(defvar blog-admin-backend-plist nil
-  "Backend blog-admin-backend-plist")
+(define-namespace blog-admin-backend-
 
-(defvar blog-admin-backend-path nil
+(defvar plist nil
+  "Backend plist")
+
+(defvar path nil
   "Blog path in filesystem")
 
-(defvar blog-admin-backend-type 'hexo
+(defvar type 'hexo
   "Type of blog backend, options :hexo")
 
-(defvar blog-admin-backend-new-post-in-drafts nil
+(defvar new-post-in-drafts nil
   "`nil`->new post will be publish, `t`-> new post will be placed in drafts")
 
-(defvar blog-admin-backend-new-post-with-same-name-dir t
+(defvar new-post-with-same-name-dir t
   "`nil`->new post will be a single file, `t`-> new post will come with a same-name directory")
 
 
-
-(defun blog-admin-backend-build-datasource (keyword)
+(defun build-datasource (keyword)
   "Build data source from backend defined"
-  (let* ((blog-backend (plist-get blog-admin-backend-plist keyword))
+  (let* ((blog-backend (plist-get plist keyword))
          (scan-posts (plist-get blog-backend :scan-posts-func))
          (read-info  (plist-get blog-backend :read-info-func))
          )
@@ -58,33 +60,32 @@
               ) (funcall scan-posts))
     ))
 
-(defun blog-admin-backend-define (keyword backend)
-  "Put backend blog-admin-backend-define into blog-admin-backend-plist"
-  (setq blog-admin-backend-plist (plist-put blog-admin-backend-plist keyword backend)))
+(defun define (keyword backend)
+  "Put backend define into plist"
+  (setq plist (plist-put plist keyword backend)))
 
-(defun blog-admin-backend-get-backend ()
+(defun get-backend ()
   "Return backend"
-  (plist-get blog-admin-backend-plist blog-admin-backend-type)
+  (plist-get plist type)
   )
 
 ;; org
-(defun blog-admin-backend--org-property-list (filename org-backend)
+(defun -org-property-list (filename org-backend)
   (if filename
       (with-temp-buffer
-
         (insert-file-contents filename)
         (org-mode)
         (org-export-get-environment org-backend))))
 
 ;; helper
-(defun blog-admin-backend--full-path (append-path)
-  "Return full absolute path base on `blog-admin-backend-path`"
+(defun -full-path (append-path)
+  "Return full absolute path base on `path`"
   (expand-file-name
    (concat
-    (file-name-as-directory blog-admin-backend-path)
+    (file-name-as-directory path)
     append-path)))
 
-(defun blog-admin-backend--format-datetime (datetime)
+(defun -format-datetime (datetime)
   (let* ((datetime-str (if (stringp datetime) datetime
                          (car datetime)))
          (l (parse-time-string datetime-str)))
@@ -99,11 +100,11 @@
   '((:date "DATE" nil nil)
     (:title "TITLE" nil nil)))
 
-(defun blog-admin-backend--read-org-info (post)
+(defun -read-org-info (post)
   "Read info of org post"
-  (blog-admin-backend--org-property-list post 'basic-org))
+  (-org-property-list post 'basic-org))
 
-(defun blog-admin-backend--read-md-info (post)
+(defun -read-md-info (post)
   "Read info of markdown post"
   (with-temp-buffer
     (insert-file-contents post)
@@ -116,6 +117,7 @@
       )
     ))
 
+) ;; namespace end here
 
 (provide 'blog-admin-backend)
 ;;; blog-admin-backend.el ends here
