@@ -1,16 +1,16 @@
 (require 'blog-admin)
 (require 'f)
-(require 'org-page)
 
-(describe "org-page"
+(describe "hexo"
           (let ((work-path nil))
             (before-each
              (setq work-path (make-temp-file "test-" t))
              (f-mkdir work-path)
-             (f-mkdir work-path "wiki")
-             (f-mkdir work-path "blog")
+             (f-mkdir work-path "source")
+             (f-mkdir work-path "source" "_drafts")
+             (f-mkdir work-path "source" "_posts")
              (setq blog-admin-backend-path work-path)
-             (setq blog-admin-backend-type 'org-page)
+             (setq blog-admin-backend-type 'hexo)
              )
 
             (after-each
@@ -21,18 +21,18 @@
              )
 
             (it
-             "new post with `blog-admin-backend-new-post-in-drafts' `t' and `blog-admin-backend-new-post-with-same-name-dir' `t', a `test.org' and `test' should exist in `<work-path>/_drafts/>"
+             "new post with `blog-admin-backend-new-post-in-drafts' `t' and `blog-admin-backend-new-post-with-same-name-dir' `t', a `test.org' and `test' should exist in `<work-path>/source/_drafts/>"
              (setq blog-admin-backend-new-post-in-drafts t)
              (setq blog-admin-backend-new-post-with-same-name-dir t)
              (blog-admin-start)
-             (blog-admin-backend-org-page-new-post "test.org")
+             (blog-admin-backend-hexo-new-post "test.org")
              (expect (f-exists?
                       (f-join
-                       work-path blog-admin-backend-org-page-drafts "test.org"))
+                       work-path blog-admin-backend-hexo-drafts-dir "test.org"))
                      :to-equal t)
              (expect (f-exists?
                       (f-join
-                       work-path blog-admin-backend-org-page-drafts "test"))
+                       work-path blog-admin-backend-hexo-drafts-dir "test"))
                      :to-equal t))
 
             (it
@@ -40,14 +40,14 @@
              (setq blog-admin-backend-new-post-in-drafts t)
              (setq blog-admin-backend-new-post-with-same-name-dir nil)
              (blog-admin-start)
-             (blog-admin-backend-org-page-new-post "test.org")
+             (blog-admin-backend-hexo-new-post "test.org")
              (expect (f-exists?
                       (f-join
-                       work-path blog-admin-backend-org-page-drafts "test.org"))
+                       work-path blog-admin-backend-hexo-drafts-dir "test.org"))
                      :to-equal t)
              (expect (f-exists?
                       (f-join
-                       work-path blog-admin-backend-org-page-drafts "test"))
+                       work-path blog-admin-backend-hexo-drafts-dir "test"))
                      :to-equal nil)))
 
 
@@ -61,9 +61,9 @@
                          (setq result file-path)
                          ))
              (blog-admin-start)
-             (blog-admin-backend-org-page-new-post "test.org")
+             (blog-admin-backend-hexo-new-post "test.org")
              (expect (f-join
-                      work-path blog-admin-backend-org-page-drafts "test.org")
+                      work-path blog-admin-backend-hexo-drafts-dir "test.org")
                      :to-equal result)
              )
            )
@@ -79,12 +79,12 @@
              (add-hook 'blog-admin-backend-after-new-post-hook
                        (lambda (file-path) (setq result2 file-path)))
              (blog-admin-start)
-             (blog-admin-backend-org-page-new-post "test.org")
+             (blog-admin-backend-hexo-new-post "test.org")
              (expect (f-join
-                      work-path blog-admin-backend-org-page-drafts "test.org")
+                      work-path blog-admin-backend-hexo-drafts-dir "test.org")
                      :to-equal result)
              (expect (f-join
-                      work-path blog-admin-backend-org-page-drafts "test.org")
+                      work-path blog-admin-backend-hexo-drafts-dir "test.org")
                      :to-equal result2)
              )
            )
