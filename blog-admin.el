@@ -6,7 +6,7 @@
 ;; Keywords: tools, blog, org, hexo, org-page
 
 ;; Version: 0.1
-;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3") (name "20151201.0"))
+;; Package-Requires: ((org "8.0") (ctable "0.1.1") (s "1.10.0") (f "0.17.3") (names "20151201.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
