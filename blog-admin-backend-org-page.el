@@ -152,22 +152,23 @@
           (blog-admin-refresh)
           (run-hook-with-args 'blog-admin-backend-after-new-post-hook file-path)
           )
-        (message "Post's filename must end with .org")
-        )))
+        )
+    (message "Post's filename must end with .org")
+    ))
 
 
-  (blog-admin-backend-define 'org-page
-                             `(:scan-posts-func
-                               ,#'-scan-posts
-                               :read-info-func
-                               ,#'-read-info
-                               :publish-unpublish-func
-                               ,#'publish-or-unpublish
-                               :new-post-func
-                               ,#'new-post
-                               ))
+(blog-admin-backend-define 'org-page
+                           `(:scan-posts-func
+                             ,#'-scan-posts
+                             :read-info-func
+                             ,#'-read-info
+                             :publish-unpublish-func
+                             ,#'publish-or-unpublish
+                             :new-post-func
+                             ,#'new-post
+                             ))
 
-  ) ;; namespace blog-admin-backend-org-page end here
+) ;; namespace blog-admin-backend-org-page end here
 
 (provide 'blog-admin-backend-org-page)
 ;;; blog-admin-backend-org-page.el ends here
