@@ -129,7 +129,7 @@ r   ... Refresh blog-admin
                                          :max-width 120)
                                         )))))
 
-    (ctbl:cp-add-click-hook table '-table-click)
+    (ctbl:cp-add-click-hook table #'-table-click)
     ))
 
 (defun delete-post ()
