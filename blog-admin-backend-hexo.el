@@ -128,7 +128,8 @@ categories:
           ))
         (save-buffer)
         (kill-buffer)
-        (blog-admin-refresh))
+        (blog-admin-refresh)
+        )
     (message "Post's filename must end with .org or .md!")
     ))
 
