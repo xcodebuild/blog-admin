@@ -44,6 +44,8 @@
 (defvar new-post-with-same-name-dir t
   "`nil`->new post will be a single file, `t`-> new post will come with a same-name directory")
 
+(defvar after-new-post-hook nil
+  "Hook after new post create, should be execute at backend-*.el")
 
 (defun build-datasource (keyword)
   "Build data source from backend defined"

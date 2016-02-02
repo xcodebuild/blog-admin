@@ -71,6 +71,45 @@
   (f-delete (f-join blog-path-org-page "_drafts") t)
   )
 
+;; (ert-deftest org-page-new-post-in-drafts-same-dir-with-hook ()
+;;   (setq blog-admin-backend-type 'org-page)
+;;   (setq blog-admin-backend-path blog-path-org-page)
+;;   (setq blog-admin-backend-org-page-drafts "_drafts")
+;;   (setq blog-admin-backend-new-post-in-drafts t)
+;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
+;;   (blog-admin-refresh)
+;;   (add-hook 'blog-admin-backend-after-new-post-hook
+;;             (lambda (path) (setq HOOK-RESULT path)))
+;;   (blog-admin-backend-org-page-new-post "test.org")
+;;   (should (f-exists? (f-join blog-path-org-page "_drafts/test.org")))
+;;   (should (f-exists? (f-join blog-path-org-page "_drafts/test")))
+;;   (should (equal HOOK-RESULT (f-join blog-path-org-page "_drafts/test.org")))
+;;   (setq HOOK-RESULT nil)
+;;   (f-delete (f-join blog-path-org-page "_drafts") t)
+;;   )
+
+;; (ert-deftest org-page-new-post-in-drafts-same-dir-with-many-hook ()
+;;   (setq blog-admin-backend-type 'org-page)
+;;   (setq blog-admin-backend-path blog-path-org-page)
+;;   (setq blog-admin-backend-org-page-drafts "_drafts")
+;;   (setq blog-admin-backend-new-post-in-drafts t)
+;;   (setq blog-admin-backend-new-post-with-same-name-dir t)
+;;   (blog-admin-refresh)
+;;   (add-hook 'blog-admin-backend-after-new-post-hook
+;;             (lambda (path) (setq HOOK-RESULT path)))
+;;   (add-hook 'blog-admin-backend-after-new-post-hook
+;;             (lambda (path) (setq HOOK-RESULT-SECOND path)))
+
+;;   (blog-admin-backend-org-page-new-post "test.org")
+;;   (should (f-exists? (f-join blog-path-org-page "_drafts/test.org")))
+;;   (should (f-exists? (f-join blog-path-org-page "_drafts/test")))
+;;   (should (equal HOOK-RESULT (f-join blog-path-org-page "_drafts/test.org")))
+;;   (should (equal HOOK-RESULT-SECOND (f-join blog-path-org-page "_drafts/test.org")))
+;;   (setq HOOK-RESULT nil)
+;;   (setq HOOK-RESULT-SECOND nil)
+;;   (f-delete (f-join blog-path-org-page "_drafts") t)
+;;   )
+
 
 ;; hexo
 
@@ -106,7 +145,6 @@
   (should (not (f-exists? (f-join blog-path-hexo "source/_drafts/test"))))
   (f-delete (f-join blog-path-hexo "source/_drafts/test.org") t)
   )
-
 
 
 ;; begin test

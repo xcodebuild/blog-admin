@@ -116,10 +116,10 @@ categories:
   "New hexo post"
   (interactive "sPost's filename(new-post.org, new-post.md etc):")
   (if (or (s-ends-with? ".org" filename) (s-ends-with? ".md" filename))
-      (progn
+      (let ((file-path (-file-path filename blog-admin-backend-new-post-in-drafts)))
         (if blog-admin-backend-new-post-with-same-name-dir
-            (f-mkdir (-file-path (f-no-ext filename) blog-admin-backend-new-post-in-drafts)))
-        (find-file (-file-path filename blog-admin-backend-new-post-in-drafts))
+            (f-mkdir (f-no-ext file-path)))
+        (find-file file-path)
         (insert
          (format
           (if (s-ends-with? ".org" filename) template-org-post template-md-post)
@@ -129,22 +129,23 @@ categories:
         (save-buffer)
         (kill-buffer)
         (blog-admin-refresh)
+        (run-hook-with-args 'blog-admin-backend-after-new-post-hook file-path)
         )
     (message "Post's filename must end with .org or .md!")
     ))
 
-(blog-admin-backend-define 'hexo
-                           `(:scan-posts-func
-                             ,#'-scan-posts
-                             :read-info-func
-                             ,#'-read-info
-                             :publish-unpublish-func
-                             ,#'-publish-or-unpublish
-                             :new-post-func
-                             ,#'new-post
-                             ))
+  (blog-admin-backend-define 'hexo
+                             `(:scan-posts-func
+                               ,#'-scan-posts
+                               :read-info-func
+                               ,#'-read-info
+                               :publish-unpublish-func
+                               ,#'-publish-or-unpublish
+                               :new-post-func
+                               ,#'new-post
+                               ))
 
-) ;; namespace blog-admin-backend-hexo end here
+  ) ;; namespace blog-admin-backend-hexo end here
 
 (provide 'blog-admin-backend-hexo)
 ;;; blog-admin-backend-hexo.el ends here
