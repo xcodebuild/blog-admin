@@ -1,6 +1,5 @@
 [[https://travis-ci.org/CodeFalling/blog-admin][https://travis-ci.org/CodeFalling/blog-admin.svg]]
 [[https://github.com/syl20bnr/spacemacs][https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
-* 
 * blog-admin
 
 Write blog in emacs with hexo or org-page.
