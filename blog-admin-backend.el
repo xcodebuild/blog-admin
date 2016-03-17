@@ -88,38 +88,43 @@
     append-path)))
 
 (defun -format-datetime (datetime)
-  (let* ((datetime-str (if (stringp datetime) datetime
-                         (car datetime)))
-         (l (parse-time-string datetime-str)))
+  (let*
+      ((datetime-in-plist (plist-get (plist-get (car datetime) 'timestamp) :raw-value)) ;; orgmode 8.2.10 return a plist
+       (datetime-str (cond
+                      ((stringp datetime-in-plist) datetime-in-plist)
+                      ((stringp datetime) datetime)
+                      (t (car datetime)) ;; some version return a list
+                      ))
+       (l (parse-time-string datetime-str)))
     (if (equal l
                '(nil nil nil nil nil nil nil nil nil)) ;; can't parse
         "Can't Parse"
       (format-time-string "%Y-%m-%d"
                           (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))))
 
-(org-export-define-derived-backend 'basic-org 'html
-  :options-alist
-  '((:date "DATE" nil nil)
-    (:title "TITLE" nil nil)))
+  (org-export-define-derived-backend 'basic-org 'html
+    :options-alist
+    '((:date "DATE" nil nil)
+      (:title "TITLE" nil nil)))
 
-(defun -read-org-info (post)
-  "Read info of org post"
-  (-org-property-list post 'basic-org))
+  (defun -read-org-info (post)
+    "Read info of org post"
+    (-org-property-list post 'basic-org))
 
-(defun -read-md-info (post)
-  "Read info of markdown post"
-  (with-temp-buffer
-    (insert-file-contents post)
-    (let ((info nil))
-      (setq info (plist-put info :title
-                            (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
-      (plist-put info :date
-                 (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
-      info
-      )
-    ))
+  (defun -read-md-info (post)
+    "Read info of markdown post"
+    (with-temp-buffer
+      (insert-file-contents post)
+      (let ((info nil))
+        (setq info (plist-put info :title
+                              (s-chop-prefix "title: " (car (s-match "^title: .*?\n" (buffer-string))))))
+        (plist-put info :date
+                   (s-chop-prefix "date: " (car (s-match "^date: .*?\n" (buffer-string)))))
+        info
+        )
+      ))
 
-) ;; namespace end here
+  ) ;; namespace end here
 
 (provide 'blog-admin-backend)
 ;;; blog-admin-backend.el ends here
