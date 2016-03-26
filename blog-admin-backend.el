@@ -89,7 +89,11 @@
 
 (defun -format-datetime (datetime)
   (let*
-      ((datetime-in-plist (plist-get (plist-get (car datetime) 'timestamp) :raw-value)) ;; orgmode 8.2.10 return a plist
+      ((datetime-in-plist
+        (if (not (stringp datetime))
+            (plist-get (plist-get (car datetime) 'timestamp) :raw-value)) ;; orgmode 8.2.10 return a plist
+        nil
+        )
        (datetime-str (cond
                       ((stringp datetime-in-plist) datetime-in-plist)
                       ((stringp datetime) datetime)
