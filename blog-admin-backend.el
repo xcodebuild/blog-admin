@@ -72,13 +72,6 @@
   )
 
 ;; org
-(defun -org-property-list (filename org-backend)
-  (if filename
-      (with-temp-buffer
-        (insert-file-contents filename)
-        (org-mode)
-        (org-export-get-environment org-backend))))
-
 ;; helper
 (defun -full-path (append-path)
   "Return full absolute path base on `path`"
@@ -106,14 +99,20 @@
       (format-time-string "%Y-%m-%d"
                           (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))))
 
-  (org-export-define-derived-backend 'basic-org 'html
-    :options-alist
-    '((:date "DATE" nil nil)
-      (:title "TITLE" nil nil)))
-
   (defun -read-org-info (post)
     "Read info of org post"
-    (-org-property-list post 'basic-org))
+    (with-temp-buffer
+      (insert-file-contents post)
+      (let ((info nil))
+        (setq info (plist-put info :title
+                              (s-trim (s-chop-prefix "#+TITLE:" (car (s-match "^#\\+TITLE:.*?\n" (buffer-string)))))))
+        (plist-put info :date
+                   (s-trim (s-chop-prefix "#+DATE:" (car (s-match "^#\\+DATE:.*?\n" (buffer-string))))))
+        info
+        )
+      ))
+
+
 
   (defun -read-md-info (post)
     "Read info of markdown post"
