@@ -82,12 +82,14 @@
 
 (defun -format-datetime (datetime)
   (let*
-      ((datetime-in-plist
+      (
+       (datetime-in-plist
         (if (not (stringp datetime))
             (plist-get (plist-get (car datetime) 'timestamp) :raw-value)) ;; orgmode 8.2.10 return a plist
         nil
         )
        (datetime-str (cond
+                      ((eq datetime nil) "") ;; nil
                       ((stringp datetime-in-plist) datetime-in-plist)
                       ((stringp datetime) datetime)
                       (t (car datetime)) ;; some version return a list
