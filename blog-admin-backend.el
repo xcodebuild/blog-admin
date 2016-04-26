@@ -101,15 +101,23 @@
       (format-time-string "%Y-%m-%d"
                           (encode-time 0 0 0 (nth 3 l) (nth 4 l) (nth 5 l))))))
 
+  (defun -default (value default)
+    (if value value default))
+
   (defun -read-org-info (post)
     "Read info of org post"
     (with-temp-buffer
       (insert-file-contents post)
       (let ((info nil))
         (setq info (plist-put info :title
-                              (s-trim (s-chop-prefix "#+TITLE:" (car (s-match "^#\\+TITLE:.*?\n" (buffer-string)))))))
+                              (s-trim (-default
+                                       (s-chop-prefix "#+TITLE:" (car (s-match "^#\\+TITLE:.*?\n" (buffer-string))))
+                                       ""
+                                       ))))
         (plist-put info :date
-                   (s-trim (s-chop-prefix "#+DATE:" (car (s-match "^#\\+DATE:.*?\n" (buffer-string))))))
+                   (s-trim (-default
+                            (s-chop-prefix "#+DATE:" (car (s-match "^#\\+DATE:.*?\n" (buffer-string))))
+                            "")))
         info
         )
       ))
