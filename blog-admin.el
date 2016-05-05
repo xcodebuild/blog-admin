@@ -83,7 +83,7 @@ r   ... Refresh blog-admin
   (define-key mode-map "d" #'delete-post)
   (define-key mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
   (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
-  (define-key mode-map "r" 'refresh)
+  (define-key mode-map "r" #'refresh)
   (setq mode-map
         (-merge-keymap mode-map ctbl:table-mode-map)))
 
