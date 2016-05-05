@@ -156,6 +156,7 @@ r   ... Refresh blog-admin
       (load-map)
       (start)
       (goto-char old-point)
+      (ctbl:navi-move-gen 0 0)
       )))
 ;; main
 
