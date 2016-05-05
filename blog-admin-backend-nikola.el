@@ -130,9 +130,10 @@
 
 (defun new-post (title &optional paste-subtree import-from)
   (interactive "MTitle: ")
-  (let* ((command (format
-                   "cd %s && %s new_post --tags=draft -t \"%s\""
-                   blog-admin-backend-path executable title))
+  (let* ((tags (if blog-admin-backend-new-post-in-drafts "--tags=draft" ""))
+         (command (format
+                   "cd %s && %s new_post %s -t \"%s\""
+                   blog-admin-backend-path executable tags title))
          (command- (or (and import-from (format "%s -i %s" command import-from))
                        command))
          (output (shell-command-to-string command-))
