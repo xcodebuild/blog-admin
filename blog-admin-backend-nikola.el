@@ -39,6 +39,7 @@
 ;; nikola define
 
 (defun -scan-posts-by-type (&optional draft)
+  "Scan posts of nikola by type -- published or draft."
   (let* ((flag (if draft "-d" "-P"))
          (resize-mini-windows nil) ;; Don't show output in mini-buffer
          (prefix (if draft "Draft" "Published"))
@@ -100,6 +101,7 @@
     ))
 
 (defun -set-or-unset-draft-tag (post make-draft)
+  "Add or remove draft tag on a post"
   (with-temp-buffer
     (insert-file-contents post)
     (goto-char (point-min))
@@ -129,6 +131,7 @@
     (blog-admin-refresh)))
 
 (defun new-post (title &optional paste-subtree import-from)
+  "New nikola post"
   (interactive "MTitle: ")
   (let* ((tags (if blog-admin-backend-new-post-in-drafts "--tags=draft" ""))
          (command (format
