@@ -173,7 +173,7 @@ r   ... Refresh blog-admin
   (mode)
   )
 
-(define-derived-mode mode nil "Blog"
+(define-derived-mode mode special-mode "Blog"
   "Major mode for blog-admin."
   (set (make-local-variable 'buffer-read-only) t))
 
