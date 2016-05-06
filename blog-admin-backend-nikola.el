@@ -100,34 +100,23 @@
     (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
     ))
 
-(defun -set-or-unset-draft-tag (post make-draft)
+(defun -toggle-draft-tag (post)
   "Add or remove draft tag on a post"
-  (with-temp-buffer
-    (insert-file-contents post)
-    (goto-char (point-min))
-    (let (end-pos)
-      (search-forward-regexp ".. tags:")
-      (save-excursion
-        (beginning-of-line 2)
-        (setq end-pos (point)))
-
-      ;; Remove draft tag
-      (beginning-of-line)
-      (when (and (not make-draft) (looking-at-p ".*?\\([:,\s]\\)draft,*"))
-        (replace-regexp "\\([:,\s]\\)draft,*\s*" "\\1" nil (point) end-pos))
-
-      ;; Add draft tag
-      (when (and make-draft (not (looking-at-p ".*?\\([:,\s]\\)draft,*")))
-        (search-forward-regexp ".. tags:")
-        (insert " draft, ")))
-    (write-file post)))
-
+  (let* ((flag (if (-is-in-drafts? post) "-r" "-a"))
+         (resize-mini-windows nil) ;; Don't show output in mini-buffer
+         (command (format
+                   "cd %s && %s tags %s draft %s"
+                   blog-admin-backend-path
+                   blog-admin-backend-nikola-executable
+                   flag
+                   post)))
+    (shell-command command)))
 
 (defun -publish-or-unpublish ()
   "Switch between publish and drafts"
   (interactive)
   (let* ((post (blog-admin--table-current-file)))
-    (-set-or-unset-draft-tag post (not (-is-in-drafts? post)))
+    (-toggle-draft-tag post)
     (blog-admin-refresh)))
 
 (defun new-post (title &optional paste-subtree import-from)
