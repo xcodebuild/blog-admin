@@ -2,7 +2,7 @@
 [[https://github.com/syl20bnr/spacemacs][https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 * blog-admin
 
-Write blog in emacs with hexo or org-page.
+Write blog in emacs with hexo, org-page or nikola.
 * Preview
 [[https://cloud.githubusercontent.com/assets/5436704/12700452/1aa686ea-c81e-11e5-92c6-5cd5e810ba35.gif]]
 * Install
@@ -66,8 +66,22 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
   (setq blog-admin-backend-org-page-drafts "_drafts") ;; directory to save draft
 #+END_SRC
 
+* nikola
+[[https://getnikola.com/][Nikola]] is Python based static blog generator that supports org-mode posts with
+a bunch of other formats.
+
+To be able to use blog-admin on your Nikola site, you will need to install the
+[[https://plugins.getnikola.com/#tags][tags plugin]] and Nikola's current master or a version >7.7.8.
+
+** configure
+#+BEGIN_SRC emacs-lisp
+  (setq blog-admin-backend-type 'nikola)
+  (setq blog-admin-backend-path "~/code/blog")
+  (setq blog-admin-backend-new-post-in-drafts t)
+  (setq blog-admin-backend-nikola-executable "~/.venvs/nikola/bin/nikola") ;; path to nikola executable
+#+END_SRC
+
 * Thanks
 1. I stole idea that operating posts in table from [[https://github.com/yoshinari-nomura/org-octopress][org-octopress]].
 2. The table build on a awesome library: [[https://github.com/kiwanami/emacs-ctable][emacs-ctable]].
 3. Thanks for [[https://github.com/magnars/s.el][s]] and [[https://github.com/rejeep/f.el][f]] who provide a modern API for emacs.
-

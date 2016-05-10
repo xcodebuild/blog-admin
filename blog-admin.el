@@ -34,6 +34,7 @@
 
 (require 'blog-admin-backend-hexo)
 (require 'blog-admin-backend-org-page)
+(require 'blog-admin-backend-nikola)
 
 (define-namespace blog-admin-
 ;; namespace blog-admin
