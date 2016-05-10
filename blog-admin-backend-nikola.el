@@ -129,13 +129,12 @@
          (command- (or (and import-from (format "%s -i %s" command import-from))
                        command))
          (output (shell-command-to-string command-))
-         ;; FIXME: This requires my special plugin.
          (path (save-match-data
-                 (string-match "\nPATH:\s*\\(.*\\)\n" output)
+                 (string-match "\n.*text is at:\s*\\(.*\\)\n" output)
                  (match-string 1 output))))
 
-    (find-file path)
     (when paste-subtree
+      (find-file path)
       (goto-char (point-max))
       (insert "\n")
       (org-paste-subtree 1)
@@ -145,8 +144,8 @@
         (org-kill-line)
         (org-next-visible-heading 1)
         (org-kill-line)
-        (org-map-entries 'org-promote)))
-    (kill-buffer))
+        (org-map-entries 'org-promote))
+      (kill-buffer)))
   (blog-admin-refresh))
 
   (blog-admin-backend-define 'nikola
