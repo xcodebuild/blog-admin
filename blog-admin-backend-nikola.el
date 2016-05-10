@@ -134,7 +134,8 @@
                  (match-string 1 output))))
 
     (when paste-subtree
-      (find-file path)
+      (org-copy-subtree)
+      (find-file (expand-file-name path blog-admin-backend-path))
       (goto-char (point-max))
       (insert "\n")
       (org-paste-subtree 1)
@@ -145,6 +146,7 @@
         (org-next-visible-heading 1)
         (org-kill-line)
         (org-map-entries 'org-promote))
+      (save-buffer)
       (kill-buffer)))
   (blog-admin-refresh))
 
