@@ -1,7 +1,7 @@
 ;;; blog-admin-backend-nikola.el --- nikola backend for blog-admin  -*- lexical-binding: t; -*-
 ;; Copyright (C) 2016
 
-;; Author: code.falling@gmail.com
+;; Author: punchagan@muse-amuse.in
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
