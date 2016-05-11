@@ -134,6 +134,22 @@ categories:
     (message "Post's filename must end with .org or .md!")
     ))
 
+(defun build-site ()
+  "Build the site."
+  (interactive)
+  (let ((command (format
+                  "cd %s && hexo generate &"
+                  blog-admin-backend-path)))
+    (shell-command command)))
+
+(defun deploy-site ()
+  "Deploy the site."
+  (interactive)
+  (let ((command (format
+                  "cd %s && hexo deploy --generate &"
+                  blog-admin-backend-path)))
+    (shell-command command)))
+
   (blog-admin-backend-define 'hexo
                              `(:scan-posts-func
                                ,#'-scan-posts
@@ -143,6 +159,10 @@ categories:
                                ,#'-publish-or-unpublish
                                :new-post-func
                                ,#'new-post
+                               :build-site-func
+                               ,#'build-site
+                               :deploy-site-func
+                               ,#'deploy-site
                                ))
 
   ) ;; namespace blog-admin-backend-hexo end here

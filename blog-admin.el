@@ -60,6 +60,8 @@ d   ... Delete current post
 w   ... Write new post
 RET ... Open current post
 r   ... Refresh blog-admin
+B   ... Build site
+D   ... Deploy site
 
 "
   "Help of table")
@@ -85,6 +87,8 @@ r   ... Refresh blog-admin
   (define-key mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
   (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
   (define-key mode-map "r" #'refresh)
+  (define-key mode-map "B" (plist-get (blog-admin-backend-get-backend) :build-site-func))
+  (define-key mode-map "D" (plist-get (blog-admin-backend-get-backend) :deploy-site-func))
   (setq mode-map
         (-merge-keymap mode-map ctbl:table-mode-map)))
 
