@@ -156,6 +156,17 @@
     (message "Post's filename must end with .org")
     ))
 
+(defun build-site ()
+  "Build the site."
+  (interactive)
+  (require 'org-page)
+  (op/do-publication t nil op/site-preview-directory))
+
+(defun deploy-site ()
+  "Deploy the site."
+  (interactive)
+  (require 'org-page)
+  (op/do-publication))
 
 (blog-admin-backend-define 'org-page
                            `(:scan-posts-func
@@ -166,6 +177,10 @@
                              ,#'publish-or-unpublish
                              :new-post-func
                              ,#'new-post
+                             :build-site-func
+                             ,#'build-site
+                             :deploy-site-func
+                             ,#'deploy-site
                              ))
 
 ) ;; namespace blog-admin-backend-org-page end here

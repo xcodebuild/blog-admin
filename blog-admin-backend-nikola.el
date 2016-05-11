@@ -26,6 +26,7 @@
 (require 'ox)
 (require 'blog-admin-backend)
 (require 'names)
+(require 'f)
 
 (define-namespace blog-admin-backend-nikola-
 
@@ -150,6 +151,39 @@
       (kill-buffer)))
   (blog-admin-refresh))
 
+(defun build-site ()
+  "Build the site."
+  (interactive)
+  (let ((command (format
+                  "cd %s && %s build &"
+                  blog-admin-backend-path executable)))
+    (-with-venv
+     (shell-command command))))
+
+(defun deploy-site ()
+  "Deploy the site."
+  (interactive)
+  (let ((command (format
+                  "cd %s && %s deploy &"
+                  blog-admin-backend-path executable)))
+    (-with-venv
+     (shell-command command))))
+
+(defmacro -with-venv (&rest body)
+    "Set exec-path and PATH to use the venv."
+    nil
+    `(let* ((-venv-dir (f-dirname blog-admin-backend-nikola-executable))
+            ;; setup emacs exec-path
+            (exec-path (append (list -venv-dir) exec-path))
+            (old-path (getenv "PATH"))
+            ;; setup the environment for subprocesses
+            (path (setenv "PATH" (concat -venv-dir path-separator old-path)))
+            result)
+       (ignore-errors
+         (setq result (progn ,@body)))
+       (setenv "PATH" old-path)
+       result))
+
   (blog-admin-backend-define 'nikola
                              `(:scan-posts-func
                                ,#'-scan-posts
@@ -159,6 +193,10 @@
                                ,#'-publish-or-unpublish
                                :new-post-func
                                ,#'new-post
+                               :build-site-func
+                               ,#'build-site
+                               :deploy-site-func
+                               ,#'deploy-site
                                ))
 
   ) ;; namespace blog-admin-backend-nikola end here
