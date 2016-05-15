@@ -62,6 +62,7 @@ RET ... Open current post
 r   ... Refresh blog-admin
 B   ... Build site
 D   ... Deploy site
+F   ... Filter and show only rows with keyword
 
 "
   "Help of table")
@@ -89,6 +90,7 @@ D   ... Deploy site
   (define-key mode-map "r" #'refresh)
   (define-key mode-map "B" (plist-get (blog-admin-backend-get-backend) :build-site-func))
   (define-key mode-map "D" (plist-get (blog-admin-backend-get-backend) :deploy-site-func))
+  (define-key mode-map "F" #'filter)
   (setq mode-map
         (-merge-keymap mode-map ctbl:table-mode-map)))
 
@@ -119,9 +121,19 @@ D   ... Deploy site
     (ctbl:navi-goto-cell (ctbl:cell-id 0 0))
     ))
 
-(defun -get-model ()
+(defun -get-model (&optional filter-keyword)
+  "Get table model (optionally only rows with FILTER-KEYWORD)."
   (let ((contents
          (blog-admin-backend-build-datasource blog-admin-backend-type)))
+    ;; Filter the rows to drop all rows not containing the keyword.
+    (when filter-keyword
+      (setq contents
+            (remove-if-not (lambda (x)
+                             ;; concatenate the row with | (dropping filename)
+                             (let ((row (mapconcat #'identity (butlast x) "|")))
+                               (s-contains? filter-keyword row t)))
+                           contents)))
+
     (make-ctbl:model
      :data contents
      :sort-state '(-1 2)
@@ -161,6 +173,14 @@ D   ... Deploy site
   "Refresh *Blog*"
   (interactive)
   (ctbl:cp-set-model blog-admin-table (-get-model)))
+
+
+(defun filter ()
+  "Filter table based on user input"
+  (interactive)
+  (let* ((keyword (read-from-minibuffer "Search filter: ")))
+    (ctbl:cp-set-model blog-admin-table (-get-model keyword))))
+
 ;; main
 
 :autoload
