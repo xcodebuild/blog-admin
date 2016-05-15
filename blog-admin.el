@@ -116,6 +116,7 @@ D   ... Deploy site
                                  :model (-get-model))))
 
     (ctbl:cp-add-click-hook table #'-table-click)
+    (ctbl:navi-goto-cell (ctbl:cell-id 0 0))
     ))
 
 (defun -get-model ()
