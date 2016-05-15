@@ -104,7 +104,7 @@ D   ... Deploy site
 
 
 
-(defun -table-build (contents keymap)
+(defun -table-build ()
   (insert -table-help)
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
@@ -112,30 +112,35 @@ D   ... Deploy site
                                  :param param
                                  :width  nil
                                  :height nil
-                                 :keymap keymap
-                                 :model
-                                 (make-ctbl:model
-                                  :data contents
-                                  :sort-state '(-1 2)
-                                  :column-model
-                                  (list (make-ctbl:cmodel
-                                         :title "Date"
-                                         :sorter 'ctbl:sort-string-lessp
-                                         :min-width 10
-                                         :align 'left)
-                                        (make-ctbl:cmodel
-                                         :title "Publish"
-                                         :align 'left
-                                         :sorter 'ctbl:sort-string-lessp)
-                                        (make-ctbl:cmodel
-                                         :title "Title"
-                                         :align 'left
-                                         :min-width 40
-                                         :max-width 120)
-                                        )))))
+                                 :keymap mode-map
+                                 :model (-get-model))))
 
     (ctbl:cp-add-click-hook table #'-table-click)
+    (ctbl:navi-goto-cell (ctbl:cell-id 0 0))
     ))
+
+(defun -get-model ()
+  (let ((contents
+         (blog-admin-backend-build-datasource blog-admin-backend-type)))
+    (make-ctbl:model
+     :data contents
+     :sort-state '(-1 2)
+     :column-model
+     (list (make-ctbl:cmodel
+            :title "Date"
+            :sorter 'ctbl:sort-string-lessp
+            :min-width 10
+            :align 'left)
+           (make-ctbl:cmodel
+            :title "Publish"
+            :align 'left
+            :sorter 'ctbl:sort-string-lessp)
+           (make-ctbl:cmodel
+            :title "Title"
+            :align 'left
+            :min-width 40
+            :max-width 120)
+           ))))
 
 (defun delete-post ()
   "Delete post"
@@ -155,14 +160,7 @@ D   ... Deploy site
 (defun refresh ()
   "Refresh *Blog*"
   (interactive)
-  (when mode-buffer
-    (let ((old-point (point)))
-      (kill-buffer mode-buffer)
-      (load-map)
-      (start)
-      (goto-char old-point)
-      (ctbl:navi-move-gen 0 0)
-      )))
+  (ctbl:cp-set-model blog-admin-table (-get-model)))
 ;; main
 
 :autoload
@@ -174,7 +172,7 @@ D   ... Deploy site
   (setq buffer-read-only nil)
   (erase-buffer)
   (load-map)
-  (-table-build (blog-admin-backend-build-datasource blog-admin-backend-type) mode-map)
+  (-table-build)
   (mode)
   )
 
