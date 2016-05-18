@@ -39,36 +39,32 @@
 
 ;; nikola define
 
-(defun -scan-posts-by-type (&optional draft)
-  "Scan posts of nikola by type -- published or draft."
-  (let* ((flag (if draft "-d" "-P"))
-         (resize-mini-windows nil) ;; Don't show output in mini-buffer
-         (prefix (if draft "Draft" "Published"))
-         (command (format
-                   "cd %s && %s status %s"
-                   blog-admin-backend-path
-                   blog-admin-backend-nikola-executable
-                   flag))
-         (output-buffer-name "*blog-admin-backend-nikola-output*")
-         (output (shell-command command output-buffer-name output-buffer-name))
-         paths)
-    (with-current-buffer output-buffer-name
-      (goto-char (point-min))
-      (delete-non-matching-lines (format "^%s: " prefix))
-      (setq paths (mapcar
-                   (lambda (x) (car (cdr x)))
-                   (s-match-strings-all "source: \\(.*?\\))" (buffer-string))))
+(defun -find-lines (prefix)
+  (remove-if-not
+   (lambda (x) (s-matches? (format "^%s: " prefix) x))
+   (s-lines (buffer-string))))
 
-      (kill-buffer))
-    (mapcar #'blog-admin-backend--full-path paths)))
+(defun -find-source (line)
+  (nth 1 (s-match "source: \\(.*?\\))" line)))
 
 (defun -scan-posts ()
   "Scan posts of nikola"
   (message "Scanning posts...")
-  (setq -draft-posts (-scan-posts-by-type t))
-  (setq -published-posts (-scan-posts-by-type))
-  (message "Scanning posts... Done!")
-  (append -draft-posts -published-posts))
+  (let* ((resize-mini-windows nil) ;; Don't show output in mini-buffer
+         (command (format
+                   "cd %s && %s status -Pd"
+                   blog-admin-backend-path
+                   blog-admin-backend-nikola-executable))
+         (output-buffer-name "*blog-admin-backend-nikola-output*")
+         (output (shell-command command output-buffer-name output-buffer-name))
+         draft-paths published-paths)
+    (message "Scanning posts... Done!")
+    (with-current-buffer output-buffer-name
+      (setq draft-paths (mapcar #'-find-source (-find-lines "Draft"))
+            published-paths (mapcar #'-find-source (-find-lines "Published"))
+            -draft-posts (mapcar #'blog-admin-backend--full-path draft-paths)
+            -published-posts (mapcar #'blog-admin-backend--full-path published-paths)))
+    (append -draft-posts -published-posts)))
 
 (defun -is-in-drafts? (post)
   "Return whether is post in drafts"
