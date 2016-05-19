@@ -31,6 +31,7 @@
 (define-namespace blog-admin-backend-nikola-
 
 (defvar posts-dir "posts")
+(defvar -posts-dir-cache nil)
 
 (defvar executable nil)
 (defvar -draft-posts nil)
@@ -47,24 +48,35 @@
 (defun -find-source (line)
   (nth 1 (s-match "source: \\(.*?\\))" line)))
 
+(defun -posts-dir-changed ()
+  (let* ((-posts-dir-cache-new
+          (directory-files (blog-admin-backend--full-path posts-dir)))
+         (changed (or (null -posts-dir-cache)
+                      (not (equal -posts-dir-cache -posts-dir-cache-new)))))
+
+    (setq -posts-dir-cache -posts-dir-cache-new)
+    changed))
+
 (defun -scan-posts ()
   "Scan posts of nikola"
-  (message "Scanning posts...")
-  (let* ((resize-mini-windows nil) ;; Don't show output in mini-buffer
-         (command (format
-                   "cd %s && %s status -Pd"
-                   blog-admin-backend-path
-                   blog-admin-backend-nikola-executable))
-         (output-buffer-name "*blog-admin-backend-nikola-output*")
-         (output (shell-command command output-buffer-name output-buffer-name))
-         draft-paths published-paths)
-    (message "Scanning posts... Done!")
-    (with-current-buffer output-buffer-name
-      (setq draft-paths (mapcar #'-find-source (-find-lines "Draft"))
-            published-paths (mapcar #'-find-source (-find-lines "Published"))
-            -draft-posts (mapcar #'blog-admin-backend--full-path draft-paths)
-            -published-posts (mapcar #'blog-admin-backend--full-path published-paths)))
-    (append -draft-posts -published-posts)))
+  (when (-posts-dir-changed)
+    (message "Scanning posts...")
+    (let* ((resize-mini-windows nil) ;; Don't show output in mini-buffer
+           (command (format
+                     "cd %s && %s status -Pd"
+                     blog-admin-backend-path
+                     blog-admin-backend-nikola-executable))
+           (output-buffer-name "*blog-admin-backend-nikola-output*")
+           (output (shell-command command output-buffer-name output-buffer-name))
+           draft-paths published-paths)
+      (message "Scanning posts... Done!")
+      (with-current-buffer output-buffer-name
+        (setq draft-paths (mapcar #'-find-source (-find-lines "Draft"))
+              published-paths (mapcar #'-find-source (-find-lines "Published"))
+              -draft-posts (mapcar #'blog-admin-backend--full-path draft-paths)
+              -published-posts (mapcar #'blog-admin-backend--full-path published-paths))
+        (kill-buffer))))
+  (append -draft-posts -published-posts))
 
 (defun -is-in-drafts? (post)
   "Return whether is post in drafts"
