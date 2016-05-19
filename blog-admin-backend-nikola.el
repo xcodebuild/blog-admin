@@ -48,12 +48,18 @@
 (defun -find-source (line)
   (nth 1 (s-match "source: \\(.*?\\))" line)))
 
-(defun -posts-dir-changed ()
-  (let* ((-posts-dir-cache-new
-          (directory-files (blog-admin-backend--full-path posts-dir)))
-         (changed (or (null -posts-dir-cache)
-                      (not (equal -posts-dir-cache -posts-dir-cache-new)))))
+(defun -get-posts-dir-cache-value ()
+  "Return list of (file modification-time) values without . & .."
+  (mapcar (lambda (f) (list (car f) (file-attribute-modification-time f)))
+          (directory-files-and-attributes
+           (blog-admin-backend--full-path posts-dir)
+           nil
+           "^\\([^.]\\|\\.[^.]\\|\\.\\..\\)")))
 
+(defun -posts-dir-changed ()
+  "Return true if any post has changed"
+  (let* ((-posts-dir-cache-new (-get-posts-dir-cache-value))
+         (changed (not (equal -posts-dir-cache -posts-dir-cache-new))))
     (setq -posts-dir-cache -posts-dir-cache-new)
     changed))
 
