@@ -67,6 +67,8 @@ F   ... Filter and show only rows with keyword
 "
   "Help of table")
 
+(defvar show-help t)
+
 (defun -merge-keymap (keymap1 keymap2)
   (append keymap1
           (delq nil
@@ -107,7 +109,7 @@ F   ... Filter and show only rows with keyword
 
 
 (defun -table-build ()
-  (insert -table-help)
+  (when show-help (insert -table-help))
   (let ((param (copy-ctbl:param ctbl:default-rendering-param)))
     (setf (ctbl:param-fixed-header param) t)
     (save-excursion (setq table (ctbl:create-table-component-region
