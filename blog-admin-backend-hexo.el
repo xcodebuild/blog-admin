@@ -19,7 +19,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
@@ -84,7 +84,7 @@ categories:
     ))
 
 (defun -file-path (name in-drafts?)
-  (f-join (blog-admin-backend--full-path 
+  (f-join (blog-admin-backend--full-path
            (if in-drafts? drafts-dir
              posts-dir))
           name))
