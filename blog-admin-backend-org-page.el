@@ -38,6 +38,8 @@
 "
   "template for org-page's org post")
 
+(defvar config-file nil
+  "path to the file where org-page is configured")
 
 ;; work with org-page
 (eval-after-load 'org-page
@@ -168,6 +170,11 @@
   (require 'org-page)
   (op/do-publication))
 
+(defun open-site-config ()
+  "Open the config file for hexo"
+  (interactive)
+  (find-file (or config-file user-init-file)))
+
 (blog-admin-backend-define 'org-page
                            `(:scan-posts-func
                              ,#'-scan-posts
@@ -181,6 +188,8 @@
                              ,#'build-site
                              :deploy-site-func
                              ,#'deploy-site
+                             :open-site-config-func
+                             ,#'open-site-config
                              ))
 
 ) ;; namespace blog-admin-backend-org-page end here

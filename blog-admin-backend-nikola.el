@@ -37,6 +37,8 @@
 (defvar -draft-posts nil)
 (defvar -published-posts nil)
 
+(defvar config-file "conf.py"
+  "filename for nikola configuration file")
 
 ;; nikola define
 
@@ -183,6 +185,11 @@
     (-with-venv
      (shell-command command))))
 
+(defun open-site-config ()
+  "Open the config file for nikola"
+  (interactive)
+  (find-file (blog-admin-backend--full-path config-file)))
+
 (defmacro -with-venv (&rest body)
     "Set exec-path and PATH to use the venv."
     nil
@@ -211,6 +218,8 @@
                                ,#'build-site
                                :deploy-site-func
                                ,#'deploy-site
+                               :open-site-config-func
+                               ,#'open-site-config
                                ))
 
   ) ;; namespace blog-admin-backend-nikola end here
