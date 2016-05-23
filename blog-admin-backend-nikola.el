@@ -50,9 +50,16 @@
 (defun -find-source (line)
   (nth 1 (s-match "source: \\(.*?\\))" line)))
 
+(defun -file-caching-value (file-attributes)
+  "Return the value for a file to be cached.
+Currently returns '(filename modification-time)"
+  (lambda (file-attributes)
+    (list (car file-attributes)
+          (nth 5 file-attributes))))
+
 (defun -get-posts-dir-cache-value ()
   "Return list of (file modification-time) values without . & .."
-  (mapcar (lambda (f) (list (car f) (file-attribute-modification-time f)))
+  (mapcar #'-file-caching-value
           (directory-files-and-attributes
            (blog-admin-backend--full-path posts-dir)
            nil
