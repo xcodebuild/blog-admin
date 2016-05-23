@@ -61,6 +61,7 @@ w   ... Write new post
 RET ... Open current post
 r   ... Refresh blog-admin
 B   ... Build site
+C   ... Jump to the config
 D   ... Deploy site
 F   ... Filter and show only rows with keyword
 
@@ -91,6 +92,7 @@ F   ... Filter and show only rows with keyword
   (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
   (define-key mode-map "r" #'refresh)
   (define-key mode-map "B" (plist-get (blog-admin-backend-get-backend) :build-site-func))
+  (define-key mode-map "C" (plist-get (blog-admin-backend-get-backend) :open-site-config-func))
   (define-key mode-map "D" (plist-get (blog-admin-backend-get-backend) :deploy-site-func))
   (define-key mode-map "F" #'filter)
   (setq mode-map

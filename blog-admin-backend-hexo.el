@@ -47,6 +47,8 @@ categories:
 
 (defvar posts-dir "source/_posts")
 (defvar drafts-dir "source/_drafts")
+(defvar config-file "_config.yml"
+  "filename for nikola configuration file")
 
 ;; hexo define
 
@@ -150,6 +152,11 @@ categories:
                   blog-admin-backend-path)))
     (shell-command command)))
 
+(defun open-site-config ()
+  "Open the config file for hexo"
+  (interactive)
+  (find-file (blog-admin-backend--full-path config-file)))
+
   (blog-admin-backend-define 'hexo
                              `(:scan-posts-func
                                ,#'-scan-posts
@@ -163,6 +170,8 @@ categories:
                                ,#'build-site
                                :deploy-site-func
                                ,#'deploy-site
+                               :open-site-config-func
+                               ,#'open-site-config
                                ))
 
   ) ;; namespace blog-admin-backend-hexo end here
