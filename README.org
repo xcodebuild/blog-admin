@@ -51,6 +51,7 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
   (setq blog-admin-backend-type 'hexo)
   (setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
   (setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
+  (setq blog-admin-backend-hexo-config-file "my_config.yml") ;; default assumes _config.yml
 #+END_SRC
 
 * org-page
@@ -64,6 +65,7 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
   (setq blog-admin-backend-new-post-in-drafts t)
   (setq blog-admin-backend-new-post-with-same-name-dir t)
   (setq blog-admin-backend-org-page-drafts "_drafts") ;; directory to save draft
+  (setq blog-admin-backend-org-page-config-file "/path/to/org-page/config.el") ;; if nil init.el is used
 #+END_SRC
 
 * nikola
@@ -79,6 +81,7 @@ To be able to use blog-admin on your Nikola site, you will need to install the
   (setq blog-admin-backend-path "~/code/blog")
   (setq blog-admin-backend-new-post-in-drafts t)
   (setq blog-admin-backend-nikola-executable "~/.venvs/nikola/bin/nikola") ;; path to nikola executable
+  (setq blog-admin-backend-nikola-config-file "my_conf.py") ;; conf.py is default
 #+END_SRC
 
 * Thanks
