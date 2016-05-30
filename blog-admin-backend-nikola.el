@@ -97,18 +97,31 @@ Currently returns '(filename modification-time)"
   "Return whether is post in drafts"
   (member post -draft-posts))
 
+
+(defun -is-ipynb? (post)
+  "Return whether post is an IPython notebook"
+  (string-equal (f-ext post) "ipynb"))
+
+
 (defun -read-nikola-info (post)
-    "Read info of any nikola post"
-    (with-temp-buffer
-      (insert-file-contents post)
-      (let ((info nil))
-        (setq info (plist-put info :title
-                              (s-chop-prefix ".. title: " (car (s-match "^\\.\\. title: .*?\n" (buffer-string))))))
-        (plist-put info :date
-                   (s-chop-prefix ".. date: " (car (s-match "^\\.\\. date: .*?\n" (buffer-string)))))
-        info
-        )
-      ))
+  "Read info of any nikola post"
+  (with-temp-buffer
+    (insert-file-contents post)
+    (let ((info nil)
+          title date)
+      (if (-is-ipynb? post)
+          (let* ((nb-json (json-read-file post))
+                 (nikola-data (assoc 'nikola (assoc 'metadata nb-json))))
+            (setq title (cdr (assoc 'title nikola-data)))
+            (setq date (cdr (assoc 'date nikola-data))))
+
+        (setq title
+              (s-chop-prefix ".. title: " (car (s-match "^\\.\\. title: .*?\n" (buffer-string)))))
+        (setq date
+              (s-chop-prefix ".. date: " (car (s-match "^\\.\\. date: .*?\n" (buffer-string))))))
+
+      (setq info (plist-put info :title title))
+      (plist-put info :date date))))
 
 (defun -read-info (post)
   "Read info of nikola post"
