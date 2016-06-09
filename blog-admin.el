@@ -193,6 +193,7 @@ F   ... Filter and show only rows with keyword
   (interactive)
   (setq mode-buffer (get-buffer-create "*Blog*"))
   (switch-to-buffer mode-buffer)
+  (setq-local default-directory blog-admin-backend-path)
   (setq buffer-read-only nil)
   (erase-buffer)
   (load-map)
