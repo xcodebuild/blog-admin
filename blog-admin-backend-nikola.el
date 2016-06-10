@@ -35,6 +35,7 @@
 
 (defvar executable nil)
 (defvar -draft-posts nil)
+(defvar -scheduled-posts nil)
 (defvar -published-posts nil)
 
 (defvar config-file "conf.py"
@@ -78,30 +79,34 @@ Currently returns '(filename modification-time)"
     (message "Scanning posts...")
     (let* ((resize-mini-windows nil) ;; Don't show output in mini-buffer
            (command (format
-                     "cd %s && %s status -Pd"
+                     "cd %s && %s status -Psd"
                      blog-admin-backend-path
                      blog-admin-backend-nikola-executable))
            (output-buffer-name "*blog-admin-backend-nikola-output*")
            (output (shell-command command output-buffer-name output-buffer-name))
-           draft-paths published-paths)
+           draft-paths published-paths scheduled-paths)
       (message "Scanning posts... Done!")
       (with-current-buffer output-buffer-name
         (setq draft-paths (mapcar #'-find-source (-find-lines "Draft"))
               published-paths (mapcar #'-find-source (-find-lines "Published"))
+              scheduled-paths (mapcar #'-find-source (-find-lines "Scheduled"))
               -draft-posts (mapcar #'blog-admin-backend--full-path draft-paths)
-              -published-posts (mapcar #'blog-admin-backend--full-path published-paths))
+              -published-posts (mapcar #'blog-admin-backend--full-path published-paths)
+              -scheduled-posts (mapcar #'blog-admin-backend--full-path scheduled-paths))
         (kill-buffer))))
-  (append -draft-posts -published-posts))
+  (append -draft-posts -published-posts -scheduled-posts))
 
 (defun -is-in-drafts? (post)
   "Return whether is post in drafts"
   (member post -draft-posts))
 
+(defun -is-scheduled? (post)
+  "Return whether the post is scheduled"
+  (member post -scheduled-posts))
 
 (defun -is-ipynb? (post)
   "Return whether post is an IPython notebook"
   (string-equal (f-ext post) "ipynb"))
-
 
 (defun -read-nikola-info (post)
   "Read info of any nikola post"
@@ -130,12 +135,12 @@ Currently returns '(filename modification-time)"
     (if (-is-in-drafts? post)
         ;; then
         (plist-put info :publish "NO")
-      ;; else
-      (plist-put info :publish "YES")
-      )
+      (if (-is-scheduled? post)
+        (plist-put info :publish "TO-BE")
+        ;; else
+        (plist-put info :publish "YES")))
     ;; format datetime
-    (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))
-    ))
+    (plist-put info :date (blog-admin-backend--format-datetime (plist-get info :date)))))
 
 (defun -toggle-draft-tag (post)
   "Add or remove draft tag on a post"
