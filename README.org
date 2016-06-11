@@ -73,7 +73,7 @@ Both ~orgmode~ or ~markdown~ works well.You can even use them at the same time.B
 a bunch of other formats.
 
 To be able to use blog-admin on your Nikola site, you will need to install the
-[[https://plugins.getnikola.com/#tags][tags plugin]] and Nikola's current master or a version >7.7.8.
+[[https://plugins.getnikola.com/#tags][tags plugin]] and Nikola >= 7.7.9.
 
 ** configure
 #+BEGIN_SRC emacs-lisp
