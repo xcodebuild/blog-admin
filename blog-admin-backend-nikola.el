@@ -161,6 +161,15 @@ Currently returns '(filename modification-time)"
     (-toggle-draft-tag post)
     (blog-admin-refresh)))
 
+
+(defun -duplicate ()
+  "Duplicate current post"
+  (interactive)
+  (let* ((post (blog-admin--table-current-file))
+         (post-copy (concat (concat (f-no-ext post) "-copy.") (f-ext post)) ))
+    (f-copy post post-copy))
+  (blog-admin-refresh))
+
 (defun new-post (title &optional paste-subtree import-from)
   "New nikola post"
   (interactive "MTitle: ")
@@ -216,38 +225,40 @@ Currently returns '(filename modification-time)"
   (find-file (blog-admin-backend--full-path config-file)))
 
 (defmacro -with-venv (&rest body)
-    "Set exec-path and PATH to use the venv."
-    nil
-    `(let* ((-venv-dir (f-dirname blog-admin-backend-nikola-executable))
-            ;; setup emacs exec-path
-            (exec-path (append (list -venv-dir) exec-path))
-            (old-path (getenv "PATH"))
-            ;; setup the environment for subprocesses
-            (path (setenv "PATH" (concat -venv-dir path-separator old-path)))
-            result)
-       (ignore-errors
-         (setq result (progn ,@body)))
-       (setenv "PATH" old-path)
-       result))
+  "Set exec-path and PATH to use the venv."
+  nil
+  `(let* ((-venv-dir (f-dirname blog-admin-backend-nikola-executable))
+          ;; setup emacs exec-path
+          (exec-path (append (list -venv-dir) exec-path))
+          (old-path (getenv "PATH"))
+          ;; setup the environment for subprocesses
+          (path (setenv "PATH" (concat -venv-dir path-separator old-path)))
+          result)
+     (ignore-errors
+       (setq result (progn ,@body)))
+     (setenv "PATH" old-path)
+     result))
 
-  (blog-admin-backend-define 'nikola
-                             `(:scan-posts-func
-                               ,#'-scan-posts
-                               :read-info-func
-                               ,#'-read-info
-                               :publish-unpublish-func
-                               ,#'-publish-or-unpublish
-                               :new-post-func
-                               ,#'new-post
-                               :build-site-func
-                               ,#'build-site
-                               :deploy-site-func
-                               ,#'deploy-site
-                               :open-site-config-func
-                               ,#'open-site-config
-                               ))
+(blog-admin-backend-define 'nikola
+                           `(:scan-posts-func
+                             ,#'-scan-posts
+                             :read-info-func
+                             ,#'-read-info
+                             :publish-unpublish-func
+                             ,#'-publish-or-unpublish
+                             :duplicate
+                             ,#'-duplicate
+                             :new-post-func
+                             ,#'new-post
+                             :build-site-func
+                             ,#'build-site
+                             :deploy-site-func
+                             ,#'deploy-site
+                             :open-site-config-func
+                             ,#'open-site-config
+                             ))
 
-  ) ;; namespace blog-admin-backend-nikola end here
+) ;; namespace blog-admin-backend-nikola end here
 
 (provide 'blog-admin-backend-nikola)
 ;;; blog-admin-backend-nikola.el ends here
