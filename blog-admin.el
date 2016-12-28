@@ -6,7 +6,7 @@
 ;; Keywords: tools, blog, org, hexo, org-page
 
 ;; Version: 0.1
-;; Package-Requires: ((ctable "0.1.1") (s "1.10.0") (f "0.17.3") (names "20151201.0"))
+;; Package-Requires: ((ctable "0.1.1") (s "1.10.0") (f "0.17.3") (names "20151201.0") (cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 (require 'org)
 (require 'ctable)
 (require 'names)
+(require 'cl-lib)
 
 (require 'blog-admin-backend-hexo)
 (require 'blog-admin-backend-org-page)
@@ -134,11 +135,11 @@ F   ... Filter and show only rows with keyword
     ;; Filter the rows to drop all rows not containing the keyword.
     (when filter-keyword
       (setq contents
-            (remove-if-not (lambda (x)
-                             ;; concatenate the row with | (dropping filename)
-                             (let ((row (mapconcat #'identity (butlast x) "|")))
-                               (s-contains? filter-keyword row t)))
-                           contents)))
+            (cl-remove-if-not (lambda (x)
+                                ;; concatenate the row with | (dropping filename)
+                                (let ((row (mapconcat #'identity (butlast x) "|")))
+                                  (s-contains? filter-keyword row t)))
+                              contents)))
 
     (make-ctbl:model
      :data contents
