@@ -113,6 +113,15 @@
     (blog-admin-refresh)
     ))
 
+(defun -duplicate ()
+  "Duplicate current post"
+  (interactive)
+  (let* ((post (blog-admin--table-current-file))
+         (post-copy (concat (concat (f-no-ext post) "-copy.") (f-ext post)) ))
+    (f-copy post post-copy))
+  (blog-admin-refresh))
+
+
 
 (defun -read-info (post)
   "Read info of org-page post"
@@ -182,7 +191,9 @@
                              ,#'-read-info
                              :publish-unpublish-func
                              ,#'publish-or-unpublish
-                             :new-post-func
+                             :duplicate
+                             ,#'-duplicate
+                            :new-post-func
                              ,#'new-post
                              :build-site-func
                              ,#'build-site

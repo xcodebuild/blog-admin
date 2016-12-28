@@ -57,6 +57,7 @@
 
 s   ... Switch between publish and drafts
 d   ... Delete current post
+c   ... Duplicate current post
 w   ... Write new post
 RET ... Open current post
 r   ... Refresh blog-admin
@@ -89,6 +90,7 @@ F   ... Filter and show only rows with keyword
 
   (define-key mode-map "d" #'delete-post)
   (define-key mode-map "s" (plist-get (blog-admin-backend-get-backend) :publish-unpublish-func))
+  (define-key mode-map "c" (plist-get (blog-admin-backend-get-backend) :duplicate))
   (define-key mode-map "w" (plist-get (blog-admin-backend-get-backend) :new-post-func))
   (define-key mode-map "r" #'refresh)
   (define-key mode-map "B" (plist-get (blog-admin-backend-get-backend) :build-site-func))

@@ -114,6 +114,14 @@ categories:
     (blog-admin-refresh)
     ))
 
+(defun -duplicate ()
+  "Duplicate current post"
+  (interactive)
+  (let* ((post (blog-admin--table-current-file))
+         (post-copy (concat (concat (f-no-ext post) "-copy.") (f-ext post)) ))
+    (f-copy post post-copy))
+  (blog-admin-refresh))
+
 (defun new-post (filename)
   "New hexo post"
   (interactive "sPost's filename(new-post.org, new-post.md etc):")
@@ -157,24 +165,26 @@ categories:
   (interactive)
   (find-file (blog-admin-backend--full-path config-file)))
 
-  (blog-admin-backend-define 'hexo
-                             `(:scan-posts-func
-                               ,#'-scan-posts
-                               :read-info-func
-                               ,#'-read-info
-                               :publish-unpublish-func
-                               ,#'-publish-or-unpublish
-                               :new-post-func
-                               ,#'new-post
-                               :build-site-func
-                               ,#'build-site
-                               :deploy-site-func
-                               ,#'deploy-site
-                               :open-site-config-func
-                               ,#'open-site-config
-                               ))
+(blog-admin-backend-define 'hexo
+                           `(:scan-posts-func
+                             ,#'-scan-posts
+                             :read-info-func
+                             ,#'-read-info
+                             :publish-unpublish-func
+                             ,#'-publish-or-unpublish
+                             :duplicate
+                             ,#'-duplicate
+                             :new-post-func
+                             ,#'new-post
+                             :build-site-func
+                             ,#'build-site
+                             :deploy-site-func
+                             ,#'deploy-site
+                             :open-site-config-func
+                             ,#'open-site-config
+                             ))
 
-  ) ;; namespace blog-admin-backend-hexo end here
+) ;; namespace blog-admin-backend-hexo end here
 
 (provide 'blog-admin-backend-hexo)
 ;;; blog-admin-backend-hexo.el ends here
