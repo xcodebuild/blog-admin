@@ -27,6 +27,7 @@
 (require 'blog-admin-backend)
 (require 'names)
 (require 'f)
+(require 'cl-lib)
 
 (define-namespace blog-admin-backend-nikola-
 
@@ -44,7 +45,7 @@
 ;; nikola define
 
 (defun -find-lines (prefix)
-  (remove-if-not
+  (cl-remove-if-not
    (lambda (x) (s-matches? (format "^%s: " prefix) x))
    (s-lines (buffer-string))))
 
