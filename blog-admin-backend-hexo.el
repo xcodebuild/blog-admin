@@ -58,7 +58,7 @@ categories:
          (mapcar
           (lambda (append-path)
             "scan files with append-path"
-            (directory-files (blog-admin-backend--full-path append-path) t "^.*\\.\\(org\\|md\\|markdown\\)$"))
+            (directory-files (blog-admin-backend--full-path append-path) t "^[^.]*\\.\\(org\\|md\\|markdown\\)$"))
           (list posts-dir drafts-dir)
           )))
 
