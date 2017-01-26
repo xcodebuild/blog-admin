@@ -1,7 +1,7 @@
 [[https://travis-ci.org/CodeFalling/blog-admin][https://travis-ci.org/CodeFalling/blog-admin.svg]]
 [[https://github.com/syl20bnr/spacemacs][https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 * blog-admin
-
+https://github.com/CodeFalling/blog-admin/issues
 Write blog in emacs with hexo, org-page or nikola.
 * Preview
 [[https://cloud.githubusercontent.com/assets/5436704/12700452/1aa686ea-c81e-11e5-92c6-5cd5e810ba35.gif]]
@@ -26,6 +26,8 @@ in your layer's packages, then
 
 #+BEGIN_SRC emacs-lisp
   (use-package blog-admin
+    :defer t
+    :commands blog-admin-start
     :init
     (progn
       ;; do your configuration here
