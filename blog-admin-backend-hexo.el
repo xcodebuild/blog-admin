@@ -148,16 +148,16 @@ categories:
   "Build the site."
   (interactive)
   (let ((command (format
-                  "cd %s && hexo generate &"
-                  blog-admin-backend-path)))
+                  "cd %s && hexo --config %s generate &"
+                  blog-admin-backend-path config-file)))
     (shell-command command)))
 
 (defun deploy-site ()
   "Deploy the site."
   (interactive)
   (let ((command (format
-                  "cd %s && hexo deploy --generate &"
-                  blog-admin-backend-path)))
+                  "cd %s && hexo --config %s deploy --generate &"
+                  blog-admin-backend-path config-file)))
     (shell-command command)))
 
 (defun open-site-config ()
