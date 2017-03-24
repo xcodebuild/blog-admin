@@ -42,6 +42,9 @@
 (defvar config-file "conf.py"
   "filename for nikola configuration file")
 
+(defvar post-format "rest"
+  "format for new posts. See nikola new_post -F to see your possibilities.")
+
 ;; nikola define
 
 (defun -find-lines (prefix)
@@ -176,8 +179,8 @@ Currently returns '(filename modification-time)"
   (interactive "MTitle: ")
   (let* ((tags (if blog-admin-backend-new-post-in-drafts "--tags=draft" ""))
          (command (format
-                   "cd %s && %s new_post %s -t \"%s\""
-                   blog-admin-backend-path executable tags title))
+                   "cd %s && %s new_post %s -t \"%s\" -f \"%s\""
+                   blog-admin-backend-path executable tags title post-format))
          (command- (or (and import-from (format "%s -i %s" command import-from))
                        command))
          (output (shell-command-to-string command-))
