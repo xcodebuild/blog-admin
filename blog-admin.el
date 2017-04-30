@@ -171,10 +171,12 @@ F   ... Filter and show only rows with keyword
           ;; remove asset directory if exist
           (let ((dir-path (file-name-sans-extension file-path)))
             (if (file-exists-p dir-path)
-                (delete-directory dir-path t))
-            )
+                (delete-directory dir-path t)))
           (refresh)
-          ))))
+          ;; Move up and down to keep the cursor inside the table
+          (unless (ignore-errors (ctbl:cursor-to-nearest-cell))
+            (forward-line -1)
+            (ctbl:navi-goto-cell (ctbl:cursor-to-nearest-cell)))))))
 
 (defun refresh ()
   "Refresh *Blog*"
