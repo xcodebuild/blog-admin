@@ -13,10 +13,11 @@ Write blog in emacs with hexo, org-page or nikola.
 3. ~(require 'blog-admin)~
 4. *You may have to install s f ctable as depends*
 ** Spacemacs
-#+BEGIN_SRC emacs-lisp
-  blog-admin
-#+END_SRC
-or install from github(not melpa)
+If you use a private spacemacs layer, just add ~blog-admin~ in your ~package.el~ then add below code into your ~private-layer-name/init-blog-admin~ 
+
+If you use a standalone ~.spacemacs~ file, just add ~blog-admin~ in your ~dotspacemacs-additional-packages~, then add below code into ~dotspacemacs/user-config()~
+
+If installing from github(not melpa)
 #+BEGIN_SRC emacs-lisp
   (blog-admin :location (recipe
                          :fetcher github
@@ -26,13 +27,16 @@ in your layer's packages, then
 
 #+BEGIN_SRC emacs-lisp
   (use-package blog-admin
-    :defer t
-    :commands blog-admin-start
-    :init
-    (progn
-      ;; do your configuration here
-      ))
+  :init
+  (progn
+    ;; your config
+    (setq blog-admin-backend-type 'hexo)
+    (setq blog-admin-backend-path "~/codefalling.com")
+    (setq blog-admin-backend-new-post-in-drafts t)
+    (setq blog-admin-backend-new-post-with-same-name-dir t)
+    ))
 #+END_SRC
+
 * Usage
 + ~(require 'blog-admin)~ first
 + ~M-x blog-admin-start~ to start this.
